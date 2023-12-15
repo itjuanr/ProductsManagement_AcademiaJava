@@ -5,7 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.ufn.ProductsManagement.models.Pagamento;
+import com.ufn.ProductsManagement.DTO.PagamentoDTO;
+import com.ufn.ProductsManagement.DTO.PagamentoRequestDTO;
 import com.ufn.ProductsManagement.service.PagamentoService;
 
 import java.util.List;
@@ -18,22 +19,22 @@ public class PagamentoController {
     private PagamentoService pagamentoService;
 
     @GetMapping
-    public ResponseEntity<List<Pagamento>> getAllPagamentos() {
-        List<Pagamento> pagamentos = pagamentoService.findAll();
+    public ResponseEntity<List<PagamentoDTO>> getAllPagamentos() {
+        List<PagamentoDTO> pagamentos = pagamentoService.findAll();
         return new ResponseEntity<>(pagamentos, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Pagamento> getPagamentoById(@PathVariable Long id) {
-        Pagamento pagamento = pagamentoService.findById(id);
+    public ResponseEntity<PagamentoDTO> getPagamentoById(@PathVariable Long id) {
+        PagamentoDTO pagamento = pagamentoService.findById(id);
         return pagamento != null
                 ? new ResponseEntity<>(pagamento, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping
-    public ResponseEntity<Pagamento> createPagamento(@RequestBody Pagamento pagamento) {
-        Pagamento savedPagamento = pagamentoService.save(pagamento);
+    public ResponseEntity<PagamentoDTO> createPagamento(@RequestBody PagamentoRequestDTO pagamentoDTO) {
+        PagamentoDTO savedPagamento = pagamentoService.save(pagamentoDTO);
         return new ResponseEntity<>(savedPagamento, HttpStatus.CREATED);
     }
 
@@ -43,15 +44,9 @@ public class PagamentoController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<Pagamento>> getPagamentosByStatus(@PathVariable String status) {
-        List<Pagamento> pagamentos = pagamentoService.findByStatus(status);
-        return new ResponseEntity<>(pagamentos, HttpStatus.OK);
-    }
-
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<Pagamento>> getPagamentosByUsuarioId(@PathVariable Long ClienteId) {
-        List<Pagamento> pagamentos = pagamentoService.findByClienteId(ClienteId);
+    @GetMapping("/usuario/{clienteId}")
+    public ResponseEntity<List<PagamentoDTO>> getPagamentosByUsuarioId(@PathVariable Long clienteId) {
+        List<PagamentoDTO> pagamentos = pagamentoService.findByClienteId(clienteId);
         return new ResponseEntity<>(pagamentos, HttpStatus.OK);
     }
 }

@@ -1,0 +1,23 @@
+<!-- cliente.component.html -->
+
+<h2>Lista de Clientes</h2>
+<div *ngIf="errorMessage">{{ errorMessage }}</div>
+
+<!-- Botões interativos -->
+<div>
+  <button (click)="loadClientes()">Carregar Clientes</button>
+  <button (click)="createCliente()">Criar Cliente</button>
+  <button (click)="searchClientes()">Buscar Clientes</button>
+</div>
+
+<!-- Lista de clientes -->
+<ul *ngIf="clientes.length > 0; else noClientes">
+  <li *ngFor="let cliente of clientes">
+    {{ cliente.nome }} - {{ cliente.email }} - {{ cliente.cpf }}
+    <button (click)="getClienteById(cliente.id)">Detalhes</button>
+    <button (click)="deleteCliente(cliente.id)">Excluir</button>
+  </li>
+</ul>
+<ng-template #noClientes>
+  <p>Nenhum cliente encontrado.</p>
+</ng-template>

@@ -1,14 +1,11 @@
 package com.ufn.ProductsManagement.service;
 
-import com.ufn.ProductsManagement.PedidoDTO;
-import com.ufn.ProductsManagement.controller.CriarPedidoRequest;
+import com.ufn.ProductsManagement.DTO.CriarPedidoRequestDTO;
+import com.ufn.ProductsManagement.DTO.PedidoDTO;
 import com.ufn.ProductsManagement.models.Cliente;
-import com.ufn.ProductsManagement.models.ItemPedido;
 import com.ufn.ProductsManagement.models.Pedido;
 import com.ufn.ProductsManagement.models.Produto;
-
 import com.ufn.ProductsManagement.repository.PedidoRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +25,7 @@ public class PedidoService {
 	@Autowired
 	private ProdutoService produtoService;
 
-	public PedidoDTO createPedido(CriarPedidoRequest criarPedidoRequest) {
+	public PedidoDTO createPedido(CriarPedidoRequestDTO criarPedidoRequest) {
 		Cliente cliente = clienteService.findById(criarPedidoRequest.getClienteId());
 
 		if (cliente == null) {
@@ -48,13 +45,11 @@ public class PedidoService {
 		Pedido pedido = new Pedido();
 		pedido.setCliente(cliente);
 		pedido.setProduto(produto);
+		pedido.setQuantidade(criarPedidoRequest.getQuantidade());
 
-		ItemPedido itemPedido = new ItemPedido();
-		itemPedido.setQuantidade(criarPedidoRequest.getQuantidade());
-		itemPedido.setCliente(cliente);
-		itemPedido.setPreco(criarPedidoRequest.getPreco());
-
-		pedido.adicionarItemPedido(itemPedido, produto);
+		BigDecimal precoProduto = BigDecimal.valueOf(produto.getPreco());
+		BigDecimal precoTotal = precoProduto.multiply(BigDecimal.valueOf(criarPedidoRequest.getQuantidade()));
+		pedido.setPreco(precoTotal);
 
 		Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
@@ -71,9 +66,60 @@ public class PedidoService {
 				.orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
 		return toPedidoDTO(pedido);
 	}
+	
+    public Pedido getPedidoById(Long id) {
+        return pedidoRepository.findById(id)
+                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
+    }
 
 	public void deletePedido(Long id) {
 		pedidoRepository.deleteById(id);
+	}
+
+	public PedidoDTO updatePedidoQuantidade(Long id, Integer novaQuantidade) {
+		Pedido pedido = pedidoRepository.findById(id)
+				.orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
+
+		if (novaQuantidade != null && novaQuantidade > 0) {
+			pedido.setQuantidade(novaQuantidade);
+			BigDecimal precoProduto = BigDecimal.valueOf(pedido.getProduto().getPreco());
+			BigDecimal precoTotal = precoProduto.multiply(BigDecimal.valueOf(novaQuantidade));
+			pedido.setPreco(precoTotal);
+		}
+
+		Pedido pedidoAtualizado = pedidoRepository.save(pedido);
+		return toPedidoDTO(pedidoAtualizado);
+	}
+
+	public PedidoDTO updatePedidoCliente(Long id, Long novoIdCliente) {
+		Pedido pedido = pedidoRepository.findById(id)
+				.orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
+
+		Cliente novoCliente = clienteService.findById(novoIdCliente);
+
+		if (novoCliente != null) {
+			pedido.setCliente(novoCliente);
+		}
+
+		Pedido pedidoAtualizado = pedidoRepository.save(pedido);
+		return toPedidoDTO(pedidoAtualizado);
+	}
+
+	public PedidoDTO updatePedidoProduto(Long id, Long novoIdProduto) {
+		Pedido pedido = pedidoRepository.findById(id)
+				.orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
+
+		Produto novoProduto = produtoService.findById(novoIdProduto);
+
+		if (novoProduto != null) {
+			pedido.setProduto(novoProduto);
+			BigDecimal precoProduto = BigDecimal.valueOf(novoProduto.getPreco());
+			BigDecimal precoTotal = precoProduto.multiply(BigDecimal.valueOf(pedido.getQuantidade()));
+			pedido.setPreco(precoTotal);
+		}
+
+		Pedido pedidoAtualizado = pedidoRepository.save(pedido);
+		return toPedidoDTO(pedidoAtualizado);
 	}
 
 	private PedidoDTO toPedidoDTO(Pedido pedido) {
@@ -93,21 +139,12 @@ public class PedidoService {
 		}
 
 		pedidoDto.setQuantidade(pedido.getQuantidade());
-		pedidoDto.setPreco(calcularPrecoPedido(pedido));
+
+		BigDecimal precoProduto = BigDecimal.valueOf(produto.getPreco());
+		BigDecimal precoTotal = precoProduto.multiply(BigDecimal.valueOf(pedido.getQuantidade()));
+		pedidoDto.setPreco(precoTotal);
 
 		return pedidoDto;
-	}
-
-
-	private BigDecimal calcularPrecoPedido(Pedido pedido) {
-		BigDecimal precoTotal = BigDecimal.ZERO;
-
-		for (ItemPedido itemPedido : pedido.getItensPedido()) {
-			BigDecimal precoItem = itemPedido.getPreco().multiply(BigDecimal.valueOf(itemPedido.getQuantidade()));
-			precoTotal = precoTotal.add(precoItem);
-		}
-
-		return precoTotal;
 	}
 
 	private void validarPedido(Cliente cliente, Produto produto) {

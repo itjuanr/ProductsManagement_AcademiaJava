@@ -1,12 +1,11 @@
 package com.ufn.ProductsManagement.controller;
 
-import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.ufn.ProductsManagement.ProdutoDTO;
+import com.ufn.ProductsManagement.DTO.ProdutoDTO;
 import com.ufn.ProductsManagement.models.Produto;
 import com.ufn.ProductsManagement.service.ProdutoService;
 

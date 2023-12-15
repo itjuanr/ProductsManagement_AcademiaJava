@@ -1,60 +1,68 @@
 package com.ufn.ProductsManagement.service;
 
-import java.util.List;
-import java.util.Optional;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ufn.ProductsManagement.models.Categoria;
 import com.ufn.ProductsManagement.repository.CategoriaRepository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class CategoriaService {
-	@Autowired
-	private CategoriaRepository categoriaRepository;
+    private static final Logger logger = LogManager.getLogger(CategoriaService.class);
 
-	public List<Categoria> findAll() {
-		return categoriaRepository.findAll();
-	}
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
-	public Categoria findById(Long id) {
-		return categoriaRepository.findById(id).orElse(null);
-	}
+    public List<Categoria> findAll() {
+        logger.info("Buscando todas as categorias");
+        return categoriaRepository.findAll();
+    }
 
-	public Categoria save(Categoria categoria) {
-		return categoriaRepository.save(categoria);
-	}
+    public Categoria findById(Long id) {
+        logger.info("Buscando categoria por ID: {}", id);
+        return categoriaRepository.findById(id).orElse(null);
+    }
 
-	public void deleteById(Long id) {
-		categoriaRepository.deleteById(id);
-	}
+    public Categoria save(Categoria categoria) {
+        logger.info("Salvando nova categoria: {}", categoria);
+        return categoriaRepository.save(categoria);
+    }
 
-	public Optional<Categoria> findByDescricao(String descricao) {
-		return categoriaRepository.findByDescricao(descricao);
-	}
+    public void deleteById(Long id) {
+        logger.info("Deletando categoria por ID: {}", id);
+        categoriaRepository.deleteById(id);
+    }
 
-	public List<Categoria> buscarCategoriasComQuantidadeProdutosMaiorQue(int quantidade) {
-		return categoriaRepository.findByQuantidadeProdutosGreaterThan(quantidade);
-	}
+    public Optional<Categoria> findByDescricao(String descricao) {
+        logger.info("Buscando categoria por descrição: {}", descricao);
+        return categoriaRepository.findByDescricao(descricao);
+    }
 
-	public List<Categoria> buscarCategoriasOrdenadasPorNome() {
-		return categoriaRepository.findByOrderByNome();
-	}
+    public List<Categoria> buscarCategoriasComQuantidadeProdutosMaiorQue(int quantidade) {
+        logger.info("Buscando categorias com quantidade de produtos maior que: {}", quantidade);
+        return categoriaRepository.findByQuantidadeProdutosGreaterThan(quantidade);
+    }
 
-	public Categoria updateCategoria(Long id, Categoria novaCategoria) {
-		Categoria categoriaExistente = findById(id);
+    public Categoria updateCategoria(Long id, Categoria novaCategoria) {
+        logger.info("Atualizando categoria com ID: {}. Nova categoria: {}", id, novaCategoria);
+        Categoria categoriaExistente = findById(id);
 
-		if (categoriaExistente != null) {
-			categoriaExistente.setNome(novaCategoria.getNome());
-			categoriaExistente.setDescricao(novaCategoria.getDescricao());
+        if (categoriaExistente != null) {
+            categoriaExistente.setNome(novaCategoria.getNome());
+            categoriaExistente.setDescricao(novaCategoria.getDescricao());
 
-			return save(categoriaExistente);
-		} else {
-			throw new CategoriaNaoEncontradaException("Categoria não encontrada para o ID: " + id);
-		}
-	}
+            return save(categoriaExistente);
+        } else {
+            logger.error("Categoria não encontrada para o ID: {}", id);
+            throw new CategoriaNaoEncontradaException("Categoria não encontrada para o ID: " + id);
+        }
+    }
 
-	public class CategoriaNaoEncontradaException extends RuntimeException {
+    public class CategoriaNaoEncontradaException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
         public CategoriaNaoEncontradaException() {
@@ -68,5 +76,5 @@ public class CategoriaService {
         public CategoriaNaoEncontradaException(String message, Throwable cause) {
             super(message, cause);
         }
-	}
+    }
 }

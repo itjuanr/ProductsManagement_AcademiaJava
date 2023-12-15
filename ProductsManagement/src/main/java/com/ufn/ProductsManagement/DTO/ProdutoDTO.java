@@ -1,4 +1,4 @@
-package com.ufn.ProductsManagement;
+package com.ufn.ProductsManagement.DTO;
 
 public class ProdutoDTO {
     private Long id;

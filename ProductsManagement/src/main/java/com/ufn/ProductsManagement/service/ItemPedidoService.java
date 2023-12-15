@@ -1,8 +1,16 @@
 package com.ufn.ProductsManagement.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.ufn.ProductsManagement.DTO.CriarItemPedidoRequestDTO;
+import com.ufn.ProductsManagement.DTO.ItemPedidoDTO;
+import com.ufn.ProductsManagement.DTO.PedidoDTO;
 import com.ufn.ProductsManagement.models.Cliente;
 import com.ufn.ProductsManagement.models.ItemPedido;
 import com.ufn.ProductsManagement.models.Pagamento;
@@ -12,97 +20,148 @@ import com.ufn.ProductsManagement.repository.ItemPedidoRepository;
 
 @Service
 public class ItemPedidoService {
-    @Autowired
-    private ItemPedidoRepository itemPedidoRepository;
 
-    public List<ItemPedido> findAll() {
-        return itemPedidoRepository.findAll();
-    }
+	private static final Logger logger = LoggerFactory.getLogger(ItemPedidoService.class);
 
-    public ItemPedido findById(Long id) {
-        return itemPedidoRepository.findById(id).orElse(null);
-    }
+	@Autowired
+	private ItemPedidoRepository itemPedidoRepository;
 
-    public ItemPedido save(ItemPedido itemPedido) {
-        validarItemPedido(itemPedido);
-        return itemPedidoRepository.save(itemPedido);
-    }
+	@Autowired
+	private PedidoService pedidoService;
 
-    public void deleteById(Long id) {
-        itemPedidoRepository.deleteById(id);
-    }
+	@Autowired
+	private PagamentoService pagamentoService;
 
-    public List<ItemPedido> findByPedidoId(Long pedidoId) {
-        return itemPedidoRepository.findByPedidoId(pedidoId);
-    }
+	public List<ItemPedidoDTO> getAllItemPedidos(Long pedidoId) {
+		logger.info("Recuperando todos os itens de pedido...");
+		List<ItemPedido> itemPedidos;
 
-    public List<ItemPedido> findByProdutoId(Long produtoId) {
-        return itemPedidoRepository.findByProdutoId(produtoId);
-    }
+		if (pedidoId != null) {
+			itemPedidos = itemPedidoRepository.findByPedidoId(pedidoId);
+		} else {
+			itemPedidos = itemPedidoRepository.findAll();
+		}
 
-    public ItemPedido atualizarQuantidade(Long itemPedidoId, int novaQuantidade) {
-        ItemPedido itemPedido = findById(itemPedidoId);
-        if (itemPedido != null) {
-            itemPedido.setQuantidade(novaQuantidade);
-            return save(itemPedido);
-        }
-        throw new ItemPedidoNaoEncontradoException("Item de Pedido não encontrado para o ID: " + itemPedidoId);
-    }
+		return itemPedidos.stream().map(this::toItemPedidoDTO).collect(Collectors.toList());
+	}
 
-    public void excluirItensDoPedido(Long pedidoId) {
-        List<ItemPedido> itensPedido = findByPedidoId(pedidoId);
-        for (ItemPedido itemPedido : itensPedido) {
-            deleteById(itemPedido.getId());
-        }
-    }
+	public ItemPedidoDTO createItemPedido(CriarItemPedidoRequestDTO requestDTO) {
+	    logger.info("Criando novo item de pedido...");
+	    
+	    PedidoDTO pedidoDTO = pedidoService.getPedidoDtoById(requestDTO.getPedidoId());
+	    
+	    Pagamento pagamento = pagamentoService.getPagamentoById(requestDTO.getPagamentoId());
 
-    public ItemPedido adicionarPagamento(Long itemPedidoId, Pagamento pagamento) {
-        ItemPedido itemPedido = findById(itemPedidoId);
-        if (itemPedido == null) {
-            throw new ItemPedidoNaoEncontradoException("Item de Pedido não encontrado para o ID: " + itemPedidoId);
-        }
-        pagamento.setItemPedido(itemPedido);
-        if (itemPedido.getPagamentos().contains(pagamento)) {
-            throw new PagamentoExistenteException("Este pagamento já foi adicionado ao item de pedido.");
-        }
-        itemPedido.getPagamentos().add(pagamento);
-        return save(itemPedido);
-    }
+	    if (pedidoDTO == null) {
+	        logger.error("Pedido não encontrado com o ID: {}", requestDTO.getPedidoId());
+	        throw new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + requestDTO.getPedidoId());
+	    }
 
-    private void validarItemPedido(ItemPedido itemPedido) {
-        if (itemPedido.getQuantidade() <= 0) {
-            throw new IllegalArgumentException("A quantidade do item deve ser um número positivo.");
-        }
+	    if (pagamento == null) {
+	        logger.error("Pagamento não encontrado com o ID: {}", requestDTO.getPagamentoId());
+	        throw new PagamentoNaoEncontradoException("Pagamento não encontrado com o ID: " + requestDTO.getPagamentoId());
+	    }
 
-        Pedido pedido = itemPedido.getPedido();
-        if (pedido == null || pedido.getId() == null) {
-            throw new IllegalArgumentException("O item de pedido deve estar associado a um pedido existente.");
-        }
+	    if (!"Aprovado".equalsIgnoreCase(pagamento.getStatus())) {
+	        logger.error("Status do pagamento deve ser 'Aprovado'");
+	        throw new PagamentoNaoAprovadoException("Status do pagamento deve ser 'Aprovado'");
+	    }
 
-        Produto produto = itemPedido.getProduto();
-        if (produto == null || produto.getId() == null) {
-            throw new IllegalArgumentException("O item de pedido deve estar associado a um produto existente.");
-        }
+	    ItemPedido itemPedido = buildItemPedidoFromDTO(requestDTO, pedidoDTO, pagamento);
+	    saveItemPedido(itemPedido);
 
-        Cliente cliente = itemPedido.getPedido().getCliente();
-        if (cliente == null || cliente.getId() == null) {
-            throw new IllegalArgumentException("O item de pedido deve estar associado a um cliente existente.");
-        }
-    }
+	    return toItemPedidoDTO(itemPedido);
+	}
 
-    public static class ItemPedidoNaoEncontradoException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
+	private ItemPedido buildItemPedidoFromDTO(CriarItemPedidoRequestDTO requestDTO, PedidoDTO pedidoDTO, Pagamento pagamento) {
+	    logger.info("Construindo ItemPedido a partir de DTO...");
+	    ItemPedido itemPedido = new ItemPedido();
 
-        public ItemPedidoNaoEncontradoException(String message) {
-            super(message);
-        }
-    }
+	    Pedido pedido = pedidoService.getPedidoById(requestDTO.getPedidoId());
+	    
+	    itemPedido.setPedido(pedido);
+	    itemPedido.setPagamento(pagamento);
+	    itemPedido.setQuantidade(pedidoDTO.getQuantidade());
+	    itemPedido.setPreco(pedidoDTO.getPreco());
 
-    public static class PagamentoExistenteException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
+	    return itemPedido;
+	}
 
-        public PagamentoExistenteException(String message) {
-            super(message);
-        }
-    }
+
+	private void saveItemPedido(ItemPedido itemPedido) {
+		logger.info("Salvando ItemPedido...");
+		itemPedidoRepository.save(itemPedido);
+	}
+
+	public ItemPedidoDTO getItemPedidoById(Long id) {
+		logger.info("Buscando ItemPedido por ID: {}", id);
+		ItemPedido itemPedido = itemPedidoRepository.findById(id)
+				.orElseThrow(() -> new ItemPedidoNaoEncontradoException("ItemPedido não encontrado com o ID: " + id));
+		return toItemPedidoDTO(itemPedido);
+	}
+
+	public ItemPedidoDTO toItemPedidoDTO(ItemPedido itemPedido) {
+		logger.info("Convertendo ItemPedido para DTO...");
+		ItemPedidoDTO itemPedidoDTO = new ItemPedidoDTO();
+
+		Pedido pedido = itemPedido.getPedido();
+		if (pedido != null) {
+			itemPedidoDTO.setPedidoId(pedido.getId());
+
+			Cliente cliente = pedido.getCliente();
+			if (cliente != null) {
+				itemPedidoDTO.setClienteId(cliente.getId());
+			}
+
+			Produto produto = pedido.getProduto();
+			if (produto != null) {
+				itemPedidoDTO.setProdutoId(produto.getId());
+			}
+
+			itemPedidoDTO.setQuantidade(itemPedido.getQuantidade());
+			itemPedidoDTO.setPreco(itemPedido.getPreco());
+		}
+
+		Pagamento pagamento = itemPedido.getPagamento();
+		if (pagamento != null) {
+			itemPedidoDTO.setPagamentoId(pagamento.getId());
+			itemPedidoDTO.setStatusPagamento(pagamento.getStatus());
+		}
+
+		itemPedidoDTO.setId(itemPedido.getId());
+
+		return itemPedidoDTO;
+	}
+
+	public static class PedidoNaoEncontradoException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+
+		public PedidoNaoEncontradoException(String message) {
+			super(message);
+		}
+	}
+
+	public static class PagamentoNaoEncontradoException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+
+		public PagamentoNaoEncontradoException(String message) {
+			super(message);
+		}
+	}
+
+	public static class PagamentoNaoAprovadoException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+
+		public PagamentoNaoAprovadoException(String message) {
+			super(message);
+		}
+	}
+
+	public static class ItemPedidoNaoEncontradoException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+
+		public ItemPedidoNaoEncontradoException(String message) {
+			super(message);
+		}
+	}
 }

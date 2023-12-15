@@ -10,6 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ItemPedidoRepository extends JpaRepository<ItemPedido, Long> {
     List<ItemPedido> findByPedidoId(Long pedidoId);
-
     List<ItemPedido> findByProdutoId(Long produtoId);
 }

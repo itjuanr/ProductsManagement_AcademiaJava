@@ -60,11 +60,4 @@ public class ClienteController {
         return cliente != null ? ResponseEntity.ok(cliente) : ResponseEntity.notFound().build();
     }
 
-
-    @GetMapping("/buscarPorNome")
-    public ResponseEntity<List<Cliente>> searchClientesByNome(@RequestParam(name = "nome") String nome) {
-        List<Cliente> clientes = clienteService.findByNome(nome);
-        return ResponseEntity.ok(clientes);
-    }
-
 }

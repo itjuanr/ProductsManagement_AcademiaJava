@@ -1,16 +1,7 @@
 package com.ufn.ProductsManagement.models;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 public class Pedido {
@@ -26,9 +17,9 @@ public class Pedido {
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ItemPedido> itensPedido = new ArrayList<>();
+    private int quantidade;
 
+    private BigDecimal preco;
 
     public Long getId() {
         return id;
@@ -54,22 +45,19 @@ public class Pedido {
         this.cliente = cliente;
     }
 
-    public List<ItemPedido> getItensPedido() {
-        return itensPedido;
-    }
-
-    public void adicionarItemPedido(ItemPedido itemPedido, Produto produto) {
-        itensPedido.add(itemPedido);
-        itemPedido.setPedido(this);
-        itemPedido.setProduto(produto);
-    }
-    
-    public void removerItemPedido(ItemPedido itemPedido) {
-        itensPedido.remove(itemPedido);
-        itemPedido.setPedido(null);
-    }
-
     public int getQuantidade() {
-        return itensPedido.stream().mapToInt(ItemPedido::getQuantidade).sum();
+        return quantidade;
+    }
+
+    public void setQuantidade(int quantidade) {
+        this.quantidade = quantidade;
+    }
+
+    public BigDecimal getPreco() {
+        return preco;
+    }
+
+    public void setPreco(BigDecimal preco) {
+        this.preco = preco;
     }
 }

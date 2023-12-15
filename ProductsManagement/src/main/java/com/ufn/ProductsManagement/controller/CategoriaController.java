@@ -51,12 +51,6 @@ public class CategoriaController {
         List<Categoria> categorias = categoriaService.buscarCategoriasComQuantidadeProdutosMaiorQue(quantidade);
         return new ResponseEntity<>(categorias, HttpStatus.OK);
     }
-
-    @GetMapping("/ordenadas-por-nome")
-    public ResponseEntity<List<Categoria>> getCategoriasOrdenadasPorNome() {
-        List<Categoria> categorias = categoriaService.buscarCategoriasOrdenadasPorNome();
-        return new ResponseEntity<>(categorias, HttpStatus.OK);
-    }
     
     @PutMapping("/{id}")
     public ResponseEntity<Categoria> updateCategoria(@PathVariable Long id, @RequestBody Categoria novaCategoria) {

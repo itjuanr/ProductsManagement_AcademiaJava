@@ -1,5 +1,6 @@
 package com.ufn.ProductsManagement.service;
 
+import com.ufn.ProductsManagement.DTO.ClienteDTO;
 import com.ufn.ProductsManagement.DTO.CriarPedidoRequestDTO;
 import com.ufn.ProductsManagement.DTO.PedidoDTO;
 import com.ufn.ProductsManagement.models.Cliente;
@@ -16,168 +17,175 @@ import java.util.stream.Collectors;
 @Service
 public class PedidoService {
 
-	@Autowired
-	private PedidoRepository pedidoRepository;
+    @Autowired
+    private PedidoRepository pedidoRepository;
 
-	@Autowired
-	private ClienteService clienteService;
+    @Autowired
+    private ClienteService clienteService;
 
-	@Autowired
-	private ProdutoService produtoService;
+    @Autowired
+    private ProdutoService produtoService;
 
-	public PedidoDTO createPedido(CriarPedidoRequestDTO criarPedidoRequest) {
-		Cliente cliente = clienteService.findById(criarPedidoRequest.getClienteId());
+    public PedidoDTO createPedido(CriarPedidoRequestDTO criarPedidoRequest) {
+        ClienteDTO clienteDTO = clienteService.findById(criarPedidoRequest.getClienteId());
 
-		if (cliente == null) {
-			throw new ClienteNaoEncontradoException(
-					"Cliente não encontrado com o ID: " + criarPedidoRequest.getClienteId());
-		}
+        if (clienteDTO == null) {
+            throw new ClienteNaoEncontradoException(
+                    "Cliente não encontrado com o ID: " + criarPedidoRequest.getClienteId());
+        }
 
-		Produto produto = produtoService.findById(criarPedidoRequest.getProdutoId());
+        Produto produto = produtoService.findById(criarPedidoRequest.getProdutoId());
 
-		if (produto == null) {
-			throw new ProdutoNaoEncontradoException(
-					"Produto não encontrado com o ID: " + criarPedidoRequest.getProdutoId());
-		}
+        if (produto == null) {
+            throw new ProdutoNaoEncontradoException(
+                    "Produto não encontrado com o ID: " + criarPedidoRequest.getProdutoId());
+        }
 
-		validarPedido(cliente, produto);
+        validarPedido(clienteDTO, produto);
 
-		Pedido pedido = new Pedido();
-		pedido.setCliente(cliente);
-		pedido.setProduto(produto);
-		pedido.setQuantidade(criarPedidoRequest.getQuantidade());
+        Pedido pedido = new Pedido();
+        pedido.setCliente(toCliente(clienteDTO));
+        pedido.setProduto(produto);
+        pedido.setQuantidade(criarPedidoRequest.getQuantidade());
 
-		BigDecimal precoProduto = BigDecimal.valueOf(produto.getPreco());
-		BigDecimal precoTotal = precoProduto.multiply(BigDecimal.valueOf(criarPedidoRequest.getQuantidade()));
-		pedido.setPreco(precoTotal);
+        BigDecimal precoProduto = BigDecimal.valueOf(produto.getPreco());
+        BigDecimal precoTotal = precoProduto.multiply(BigDecimal.valueOf(pedido.getQuantidade()));
+        pedido.setPreco(precoTotal);
 
-		Pedido pedidoSalvo = pedidoRepository.save(pedido);
+        Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
-		return toPedidoDTO(pedidoSalvo);
-	}
+        return toPedidoDTO(pedidoSalvo);
+    }
 
-	public List<PedidoDTO> getAllPedidos() {
-		List<Pedido> pedidos = pedidoRepository.findAll();
-		return pedidos.stream().map(this::toPedidoDTO).collect(Collectors.toList());
-	}
+    public List<PedidoDTO> getAllPedidos() {
+        List<Pedido> pedidos = pedidoRepository.findAll();
+        return pedidos.stream().map(this::toPedidoDTO).collect(Collectors.toList());
+    }
 
-	public PedidoDTO getPedidoDtoById(Long id) {
-		Pedido pedido = pedidoRepository.findById(id)
-				.orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
-		return toPedidoDTO(pedido);
-	}
-	
+    public PedidoDTO getPedidoDtoById(Long id) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
+        return toPedidoDTO(pedido);
+    }
+
     public Pedido getPedidoById(Long id) {
         return pedidoRepository.findById(id)
                 .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
     }
 
-	public void deletePedido(Long id) {
-		pedidoRepository.deleteById(id);
-	}
+    public void deletePedido(Long id) {
+        pedidoRepository.deleteById(id);
+    }
 
-	public PedidoDTO updatePedidoQuantidade(Long id, Integer novaQuantidade) {
-		Pedido pedido = pedidoRepository.findById(id)
-				.orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
+    public PedidoDTO updatePedidoQuantidade(Long id, Integer novaQuantidade) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
 
-		if (novaQuantidade != null && novaQuantidade > 0) {
-			pedido.setQuantidade(novaQuantidade);
-			BigDecimal precoProduto = BigDecimal.valueOf(pedido.getProduto().getPreco());
-			BigDecimal precoTotal = precoProduto.multiply(BigDecimal.valueOf(novaQuantidade));
-			pedido.setPreco(precoTotal);
-		}
+        if (novaQuantidade != null && novaQuantidade > 0) {
+            pedido.setQuantidade(novaQuantidade);
+            BigDecimal precoProduto = BigDecimal.valueOf(pedido.getProduto().getPreco());
+            BigDecimal precoTotal = precoProduto.multiply(BigDecimal.valueOf(pedido.getQuantidade()));
+            pedido.setPreco(precoTotal);
+        }
 
-		Pedido pedidoAtualizado = pedidoRepository.save(pedido);
-		return toPedidoDTO(pedidoAtualizado);
-	}
+        Pedido pedidoAtualizado = pedidoRepository.save(pedido);
+        return toPedidoDTO(pedidoAtualizado);
+    }
 
-	public PedidoDTO updatePedidoCliente(Long id, Long novoIdCliente) {
-		Pedido pedido = pedidoRepository.findById(id)
-				.orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
+    public PedidoDTO updatePedidoCliente(Long id, Long novoIdCliente) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
 
-		Cliente novoCliente = clienteService.findById(novoIdCliente);
+        ClienteDTO novoClienteDTO = clienteService.findById(novoIdCliente);
 
-		if (novoCliente != null) {
-			pedido.setCliente(novoCliente);
-		}
+        if (novoClienteDTO != null) {
+            Cliente novoCliente = toCliente(novoClienteDTO);
+            pedido.setCliente(novoCliente);
+        }
 
-		Pedido pedidoAtualizado = pedidoRepository.save(pedido);
-		return toPedidoDTO(pedidoAtualizado);
-	}
+        Pedido pedidoAtualizado = pedidoRepository.save(pedido);
+        return toPedidoDTO(pedidoAtualizado);
+    }
 
-	public PedidoDTO updatePedidoProduto(Long id, Long novoIdProduto) {
-		Pedido pedido = pedidoRepository.findById(id)
-				.orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
+    public PedidoDTO updatePedidoProduto(Long id, Long novoIdProduto) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + id));
 
-		Produto novoProduto = produtoService.findById(novoIdProduto);
+        Produto novoProduto = produtoService.findById(novoIdProduto);
 
-		if (novoProduto != null) {
-			pedido.setProduto(novoProduto);
-			BigDecimal precoProduto = BigDecimal.valueOf(novoProduto.getPreco());
-			BigDecimal precoTotal = precoProduto.multiply(BigDecimal.valueOf(pedido.getQuantidade()));
-			pedido.setPreco(precoTotal);
-		}
+        if (novoProduto != null) {
+            pedido.setProduto(novoProduto);
+            BigDecimal precoProduto = BigDecimal.valueOf(novoProduto.getPreco());
+            BigDecimal precoTotal = precoProduto.multiply(BigDecimal.valueOf(pedido.getQuantidade()));
+            pedido.setPreco(precoTotal);
+        }
 
-		Pedido pedidoAtualizado = pedidoRepository.save(pedido);
-		return toPedidoDTO(pedidoAtualizado);
-	}
+        Pedido pedidoAtualizado = pedidoRepository.save(pedido);
+        return toPedidoDTO(pedidoAtualizado);
+    }
+    
+    private Cliente toCliente(ClienteDTO clienteDTO) {
+        Cliente cliente = new Cliente();
+        cliente.setId(clienteDTO.getId());
+        cliente.setNome(clienteDTO.getNome());
 
-	private PedidoDTO toPedidoDTO(Pedido pedido) {
-		PedidoDTO pedidoDto = new PedidoDTO();
-		pedidoDto.setIdPedido(pedido.getId());
+        return cliente;
+    }
 
-		Cliente cliente = pedido.getCliente();
-		if (cliente != null) {
-			pedidoDto.setClienteId(cliente.getId());
-			pedidoDto.setClienteNome(cliente.getNome());
-		}
+    private PedidoDTO toPedidoDTO(Pedido pedido) {
+        PedidoDTO pedidoDto = new PedidoDTO();
+        pedidoDto.setIdPedido(pedido.getId());
 
-		Produto produto = pedido.getProduto();
-		if (produto != null) {
-			pedidoDto.setProdutoId(produto.getId());
-			pedidoDto.setProdutoNome(produto.getNome());
-		}
+        Cliente cliente = pedido.getCliente();
+        if (cliente != null) {
+            pedidoDto.setClienteId(cliente.getId());
+            pedidoDto.setClienteNome(cliente.getNome());
+        }
 
-		pedidoDto.setQuantidade(pedido.getQuantidade());
+        Produto produto = pedido.getProduto();
+        if (produto != null) {
+            pedidoDto.setProdutoId(produto.getId());
+            pedidoDto.setProdutoNome(produto.getNome());
+        }
 
-		BigDecimal precoProduto = BigDecimal.valueOf(produto.getPreco());
-		BigDecimal precoTotal = precoProduto.multiply(BigDecimal.valueOf(pedido.getQuantidade()));
-		pedidoDto.setPreco(precoTotal);
+        pedidoDto.setQuantidade(pedido.getQuantidade());
 
-		return pedidoDto;
-	}
+        pedidoDto.setPreco(pedido.getPreco());
 
-	private void validarPedido(Cliente cliente, Produto produto) {
-		if (cliente == null) {
-			throw new IllegalArgumentException("Cliente é obrigatório para criar um pedido.");
-		}
+        return pedidoDto;
+    }
 
-		if (produto == null) {
-			throw new IllegalArgumentException("Produto é obrigatório para criar um pedido.");
-		}
-	}
+    private void validarPedido(ClienteDTO clienteDTO, Produto produto) {
+        if (clienteDTO == null) {
+            throw new IllegalArgumentException("Cliente é obrigatório para criar um pedido.");
+        }
 
-	public class ClienteNaoEncontradoException extends RuntimeException {
-		private static final long serialVersionUID = 1L;
+        if (produto == null) {
+            throw new IllegalArgumentException("Produto é obrigatório para criar um pedido.");
+        }
+    }
 
-		public ClienteNaoEncontradoException(String message) {
-			super(message);
-		}
-	}
+    public class ClienteNaoEncontradoException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
 
-	public class ProdutoNaoEncontradoException extends RuntimeException {
-		private static final long serialVersionUID = 1L;
+        public ClienteNaoEncontradoException(String message) {
+            super(message);
+        }
+    }
 
-		public ProdutoNaoEncontradoException(String message) {
-			super(message);
-		}
-	}
+    public class ProdutoNaoEncontradoException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
 
-	public class PedidoNaoEncontradoException extends RuntimeException {
-		private static final long serialVersionUID = 1L;
+        public ProdutoNaoEncontradoException(String message) {
+            super(message);
+        }
+    }
 
-		public PedidoNaoEncontradoException(String message) {
-			super(message);
-		}
-	}
+    public class PedidoNaoEncontradoException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public PedidoNaoEncontradoException(String message) {
+            super(message);
+        }
+    }
 }

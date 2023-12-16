@@ -46,47 +46,61 @@ public class ItemPedidoService {
 	}
 
 	public ItemPedidoDTO createItemPedido(CriarItemPedidoRequestDTO requestDTO) {
-	    logger.info("Criando novo item de pedido...");
-	    
-	    PedidoDTO pedidoDTO = pedidoService.getPedidoDtoById(requestDTO.getPedidoId());
-	    
-	    Pagamento pagamento = pagamentoService.getPagamentoById(requestDTO.getPagamentoId());
+		logger.info("Criando novo item de pedido...");
 
-	    if (pedidoDTO == null) {
-	        logger.error("Pedido não encontrado com o ID: {}", requestDTO.getPedidoId());
-	        throw new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + requestDTO.getPedidoId());
-	    }
+		PedidoDTO pedidoDTO = pedidoService.getPedidoDtoById(requestDTO.getPedidoId());
 
-	    if (pagamento == null) {
-	        logger.error("Pagamento não encontrado com o ID: {}", requestDTO.getPagamentoId());
-	        throw new PagamentoNaoEncontradoException("Pagamento não encontrado com o ID: " + requestDTO.getPagamentoId());
-	    }
+		Pagamento pagamento = pagamentoService.getPagamentoById(requestDTO.getPagamentoId());
 
-	    if (!"Aprovado".equalsIgnoreCase(pagamento.getStatus())) {
-	        logger.error("Status do pagamento deve ser 'Aprovado'");
-	        throw new PagamentoNaoAprovadoException("Status do pagamento deve ser 'Aprovado'");
-	    }
+		if (pedidoDTO == null) {
+			logger.error("Pedido não encontrado com o ID: {}", requestDTO.getPedidoId());
+			throw new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + requestDTO.getPedidoId());
+		}
 
-	    ItemPedido itemPedido = buildItemPedidoFromDTO(requestDTO, pedidoDTO, pagamento);
-	    saveItemPedido(itemPedido);
+		if (pagamento == null) {
+			logger.error("Pagamento não encontrado com o ID: {}", requestDTO.getPagamentoId());
+			throw new PagamentoNaoEncontradoException(
+					"Pagamento não encontrado com o ID: " + requestDTO.getPagamentoId());
+		}
 
-	    return toItemPedidoDTO(itemPedido);
+		if (!"Aprovado".equalsIgnoreCase(pagamento.getStatus())) {
+			logger.error("Status do pagamento deve ser 'Aprovado'");
+			throw new PagamentoNaoAprovadoException("Status do pagamento deve ser 'Aprovado'");
+		}
+
+		ItemPedido itemPedido = buildItemPedidoFromDTO(requestDTO, pedidoDTO, pagamento);
+		saveItemPedido(itemPedido);
+
+		return toItemPedidoDTO(itemPedido);
 	}
 
-	private ItemPedido buildItemPedidoFromDTO(CriarItemPedidoRequestDTO requestDTO, PedidoDTO pedidoDTO, Pagamento pagamento) {
-	    logger.info("Construindo ItemPedido a partir de DTO...");
-	    ItemPedido itemPedido = new ItemPedido();
+	private ItemPedido buildItemPedidoFromDTO(CriarItemPedidoRequestDTO requestDTO, PedidoDTO pedidoDTO,
+			Pagamento pagamento) {
+		logger.info("Construindo ItemPedido a partir de DTO...");
 
-	    Pedido pedido = pedidoService.getPedidoById(requestDTO.getPedidoId());
-	    
-	    itemPedido.setPedido(pedido);
-	    itemPedido.setPagamento(pagamento);
-	    itemPedido.setQuantidade(pedidoDTO.getQuantidade());
-	    itemPedido.setPreco(pedidoDTO.getPreco());
+		Pedido pedido = pedidoService.getPedidoById(requestDTO.getPedidoId());
 
-	    return itemPedido;
+		if (pedido == null) {
+			logger.error("Pedido não encontrado com o ID: {}", requestDTO.getPedidoId());
+		}
+
+		Cliente cliente = pedido.getCliente();
+		Produto produto = pedido.getProduto();
+
+		if (cliente == null || produto == null) {
+			logger.error("Cliente ou Produto não encontrado no pedido com ID: {}", pedido.getId());
+		}
+
+		ItemPedido itemPedido = new ItemPedido();
+		itemPedido.setPedido(pedido);
+		itemPedido.setCliente(cliente);
+		itemPedido.setProduto(produto);
+		itemPedido.setPagamento(pagamento);
+		itemPedido.setQuantidade(pedidoDTO.getQuantidade());
+		itemPedido.setPreco(pedidoDTO.getPreco());
+
+		return itemPedido;
 	}
-
 
 	private void saveItemPedido(ItemPedido itemPedido) {
 		logger.info("Salvando ItemPedido...");
@@ -108,12 +122,13 @@ public class ItemPedidoService {
 		if (pedido != null) {
 			itemPedidoDTO.setPedidoId(pedido.getId());
 
-			Cliente cliente = pedido.getCliente();
+			Cliente cliente = pedidoService.getPedidoById(pedido.getId()).getCliente();
+			Produto produto = pedidoService.getPedidoById(pedido.getId()).getProduto();
+
 			if (cliente != null) {
 				itemPedidoDTO.setClienteId(cliente.getId());
 			}
 
-			Produto produto = pedido.getProduto();
 			if (produto != null) {
 				itemPedidoDTO.setProdutoId(produto.getId());
 			}

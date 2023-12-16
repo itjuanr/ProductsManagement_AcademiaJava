@@ -28,6 +28,7 @@ public class PagamentoService {
 	@Autowired
 	private PedidoService pedidoService;
 
+
 	public List<PagamentoDTO> findAll() {
 		logger.info("Buscando todos os pagamentos");
 		List<Pagamento> pagamentos = pagamentoRepository.findAll();
@@ -105,16 +106,32 @@ public class PagamentoService {
 	}
 
 	private Pagamento convertToPagamento(PagamentoRequestDTO pagamentoDTO) {
-		Pagamento pagamento = new Pagamento();
-		pagamento.setValor(pagamentoDTO.getPrecoPago());
-		pagamento.setStatus("Aprovado");
-		pagamento.setDataPagamento(new Date());
+	    Pagamento pagamento = new Pagamento();
+	    pagamento.setValor(pagamentoDTO.getPrecoPago());
+	    pagamento.setStatus("Aprovado");
+	    pagamento.setDataPagamento(new Date());
 
-		Pedido pedido = new Pedido();
-		pedido.setId(pagamentoDTO.getPedidoId());
-		pagamento.setPedido(pedido);
+	    Pedido pedido = pedidoService.getPedidoById(pagamentoDTO.getPedidoId());
 
-		return pagamento;
+	    if (pedido == null) {
+	        logger.error("Pedido não encontrado com o ID: {}", pagamentoDTO.getPedidoId());
+	        throw new PedidoNaoEncontradoException("Pedido não encontrado com o ID: " + pagamentoDTO.getPedidoId());
+	    }
+
+	    pagamento.setPedido(pedido);
+	    pagamento.setClienteFromPedido();
+
+	    return pagamento;
+	}
+
+
+
+	public static class PedidoNaoEncontradoException extends RuntimeException {
+	    private static final long serialVersionUID = 1L;
+
+	    public PedidoNaoEncontradoException(String message) {
+	        super(message);
+	    }
 	}
 
 	public static class PagamentoInvalidoException extends RuntimeException {

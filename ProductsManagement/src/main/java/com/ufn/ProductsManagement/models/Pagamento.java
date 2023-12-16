@@ -3,7 +3,6 @@ package com.ufn.ProductsManagement.models;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,68 +12,88 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
+
 @Entity
 public class Pagamento {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	private BigDecimal valor;
+    private BigDecimal valor;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date dataPagamento;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataPagamento;
 
-	private String status;
+    private String status;
 
-	@Column(name = "cliente_id")
-	private Long clienteId;
+    @ManyToOne
+    @JoinColumn(name = "pedido_id")
+    private Pedido pedido;
 
-	@ManyToOne
-	@JoinColumn(name = "pedido_id")
-	private Pedido pedido;
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
 
-	public Long getId() {
-		return id;
-	}
+    public Pagamento() {
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Pagamento(BigDecimal valor, Date dataPagamento, String status) {
+        this.valor = valor;
+        this.dataPagamento = dataPagamento;
+        this.status = status;
+    }
 
-	public BigDecimal getValor() {
-		return valor;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setValor(BigDecimal valor) {
-		this.valor = valor;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public Date getDataPagamento() {
-		return dataPagamento;
-	}
+    public BigDecimal getValor() {
+        return valor;
+    }
 
-	public void setDataPagamento(Date dataPagamento) {
-		this.dataPagamento = dataPagamento;
-	}
+    public void setValor(BigDecimal valor) {
+        this.valor = valor;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public Date getDataPagamento() {
+        return dataPagamento;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public void setDataPagamento(Date dataPagamento) {
+        this.dataPagamento = dataPagamento;
+    }
 
-	public Pedido getPedido() {
-		return pedido;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public void setPedido(Pedido pedido) {
-		this.pedido = pedido;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	public Produto getProdutoDoPedido() {
-		return pedido != null ? pedido.getProduto() : null;
-	}
+    public Pedido getPedido() {
+        return pedido;
+    }
 
+    public void setPedido(Pedido pedido) {
+        this.pedido = pedido;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+    
+    public void setClienteFromPedido() {
+        if (pedido != null && pedido.getCliente() != null) {
+            this.cliente = pedido.getCliente();
+        }
+    }
 }

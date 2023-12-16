@@ -13,7 +13,6 @@ public class Categoria {
 
     private String nome;
     private String descricao; 
-    private int quantidadeProdutos;
     
     public Long getId() {
         return id;
@@ -39,11 +38,4 @@ public class Categoria {
         this.descricao = descricao;
     }
     
-    public int getQuantidadeProdutos() {
-        return quantidadeProdutos;
-    }
-
-    public void setQuantidadeProdutos(int quantidadeProdutos) {
-        this.quantidadeProdutos = quantidadeProdutos;
-    }
 }

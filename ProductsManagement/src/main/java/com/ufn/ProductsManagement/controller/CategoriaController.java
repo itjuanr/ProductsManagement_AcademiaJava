@@ -45,12 +45,6 @@ public class CategoriaController {
         categoriaService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
-    @GetMapping("/quantidade-maior-que/{quantidade}")
-    public ResponseEntity<List<Categoria>> getCategoriasPorQuantidadeMaiorQue(@PathVariable int quantidade) {
-        List<Categoria> categorias = categoriaService.buscarCategoriasComQuantidadeProdutosMaiorQue(quantidade);
-        return new ResponseEntity<>(categorias, HttpStatus.OK);
-    }
     
     @PutMapping("/{id}")
     public ResponseEntity<Categoria> updateCategoria(@PathVariable Long id, @RequestBody Categoria novaCategoria) {

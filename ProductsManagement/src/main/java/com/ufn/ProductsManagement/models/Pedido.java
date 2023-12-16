@@ -2,6 +2,7 @@ package com.ufn.ProductsManagement.models;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 public class Pedido {
@@ -20,6 +21,21 @@ public class Pedido {
     private int quantidade;
 
     private BigDecimal preco;
+
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
+    private List<Pagamento> pagamentos;
+
+    public Pedido() {
+    }
+
+    public Pedido(Produto produto, Cliente cliente, int quantidade, BigDecimal preco) {
+        this.produto = produto;
+        this.cliente = cliente;
+        this.quantidade = quantidade;
+        this.preco = preco;
+    }
+
+    // Getters e Setters
 
     public Long getId() {
         return id;
@@ -59,5 +75,13 @@ public class Pedido {
 
     public void setPreco(BigDecimal preco) {
         this.preco = preco;
+    }
+
+    public List<Pagamento> getPagamentos() {
+        return pagamentos;
+    }
+
+    public void setPagamentos(List<Pagamento> pagamentos) {
+        this.pagamentos = pagamentos;
     }
 }

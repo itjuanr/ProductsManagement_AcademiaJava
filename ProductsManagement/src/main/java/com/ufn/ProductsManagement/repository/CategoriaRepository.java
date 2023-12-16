@@ -14,8 +14,6 @@ public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
 
     Optional<Categoria> findByDescricao(String descricao);
 
-    List<Categoria> findByQuantidadeProdutosGreaterThan(int quantidade);
-
     List<Categoria> findByOrderByNome();
 
 }

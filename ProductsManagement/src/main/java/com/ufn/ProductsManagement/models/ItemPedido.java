@@ -9,25 +9,27 @@ public class ItemPedido {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "pedido_id")
 	private Pedido pedido;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "produto_id")
 	private Produto produto;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "cliente_id")
 	private Cliente cliente;
 
-	@ManyToOne
-	@JoinColumn(name = "pagamento_id")
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "pagamento_id", nullable = false)
 	private Pagamento pagamento;
+
+	@Column(name = "status_pagamento")
+	private String statusPagamento;
 
 	private int quantidade;
 	private BigDecimal preco;
-	private String statusPagamento;
 
 	public Long getId() {
 		return id;

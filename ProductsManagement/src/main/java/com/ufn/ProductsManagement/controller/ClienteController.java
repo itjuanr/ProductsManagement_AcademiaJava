@@ -1,15 +1,14 @@
 package com.ufn.ProductsManagement.controller;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.ufn.ProductsManagement.DTO.ClienteDTO;
+import com.ufn.ProductsManagement.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.ufn.ProductsManagement.models.Cliente;
-import com.ufn.ProductsManagement.service.ClienteService;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/clientes")
@@ -19,21 +18,21 @@ public class ClienteController {
     private ClienteService clienteService;
 
     @GetMapping
-    public List<Cliente> getAllClientes() {
+    public List<ClienteDTO> getAllClientes() {
         return clienteService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> getClienteById(@PathVariable Long id) {
-        Cliente cliente = clienteService.findById(id);
-        return ResponseEntity.of(Optional.ofNullable(cliente));
+    public ResponseEntity<ClienteDTO> getClienteById(@PathVariable Long id) {
+        ClienteDTO clienteDTO = clienteService.findById(id);
+        return ResponseEntity.of(Optional.ofNullable(clienteDTO));
     }
 
     @PostMapping
-    public ResponseEntity<Cliente> createCliente(@RequestBody Cliente cliente) {
+    public ResponseEntity<ClienteDTO> createCliente(@RequestBody ClienteDTO clienteDTO) {
         try {
-            Cliente savedCliente = clienteService.save(cliente);
-            return new ResponseEntity<>(savedCliente, HttpStatus.CREATED);
+            ClienteDTO savedClienteDTO = clienteService.save(clienteDTO);
+            return new ResponseEntity<>(savedClienteDTO, HttpStatus.CREATED);
         } catch (ClienteService.ClienteEmailDuplicadoException | ClienteService.ClienteCpfDuplicadoException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -46,18 +45,14 @@ public class ClienteController {
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<Cliente> searchClientes(@RequestParam(name = "email", required = false) String email,
-                                                  @RequestParam(name = "nome", required = false) String nome) {
-        Cliente cliente = null; 
-
+    public ResponseEntity<ClienteDTO> searchClientes(@RequestParam(name = "email", required = false) String email,
+                                                     @RequestParam(name = "nome", required = false) String nome) {
         if (email != null) {
-            cliente = clienteService.findByEmail(email);
+            ClienteDTO clienteDTO = clienteService.findByEmail(email);
+            return clienteDTO != null ? ResponseEntity.ok(clienteDTO) : ResponseEntity.notFound().build();
         } else if (nome != null) {
-        } else {
-            return ResponseEntity.badRequest().build();
         }
 
-        return cliente != null ? ResponseEntity.ok(cliente) : ResponseEntity.notFound().build();
+        return ResponseEntity.badRequest().build();
     }
-
 }

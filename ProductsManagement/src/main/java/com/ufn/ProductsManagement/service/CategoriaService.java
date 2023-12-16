@@ -42,11 +42,6 @@ public class CategoriaService {
         return categoriaRepository.findByDescricao(descricao);
     }
 
-    public List<Categoria> buscarCategoriasComQuantidadeProdutosMaiorQue(int quantidade) {
-        logger.info("Buscando categorias com quantidade de produtos maior que: {}", quantidade);
-        return categoriaRepository.findByQuantidadeProdutosGreaterThan(quantidade);
-    }
-
     public Categoria updateCategoria(Long id, Categoria novaCategoria) {
         logger.info("Atualizando categoria com ID: {}. Nova categoria: {}", id, novaCategoria);
         Categoria categoriaExistente = findById(id);

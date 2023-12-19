@@ -35,8 +35,6 @@ public class Pedido {
         this.preco = preco;
     }
 
-    // Getters e Setters
-
     public Long getId() {
         return id;
     }

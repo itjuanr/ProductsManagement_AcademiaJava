@@ -12,7 +12,7 @@ import com.ufn.ProductsManagement.service.PagamentoService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/pagamentos")
+@RequestMapping("/pagamentos")
 public class PagamentoController {
 
     @Autowired

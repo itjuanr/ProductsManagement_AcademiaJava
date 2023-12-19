@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,5 +51,14 @@ public class AuthenticationController {
 		this.repository.save(newUser);
 
 		return ResponseEntity.ok().build();
+	}
+	
+	@PostMapping("/logout")
+	public ResponseEntity logout(@RequestHeader("Authorization") String token) {
+	    token = token.replace("Bearer ", "");
+
+	    tokenService.addToBlacklist(token);
+
+	    return ResponseEntity.ok("Logout bem-sucedido");
 	}
 }

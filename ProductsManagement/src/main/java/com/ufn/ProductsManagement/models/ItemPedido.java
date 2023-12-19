@@ -26,7 +26,7 @@ public class ItemPedido {
 	private Pagamento pagamento;
 
 	@Column(name = "status_pagamento")
-	private String statusPagamento;
+	private String statusPagamento = "Aprovado"; ;
 
 	private int quantidade;
 	private BigDecimal preco;
@@ -98,4 +98,5 @@ public class ItemPedido {
 	public BigDecimal calcularPrecoTotalItem() {
 		return preco.multiply(BigDecimal.valueOf(quantidade));
 	}
+
 }

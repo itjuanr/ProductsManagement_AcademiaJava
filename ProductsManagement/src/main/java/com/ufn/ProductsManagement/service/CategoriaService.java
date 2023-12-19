@@ -29,6 +29,13 @@ public class CategoriaService {
 
     public Categoria save(Categoria categoria) {
         logger.info("Salvando nova categoria: {}", categoria);
+
+        Optional<Categoria> categoriaExistente = findByDescricao(categoria.getDescricao());
+        if (categoriaExistente.isPresent()) {
+            logger.error("Já existe uma categoria com a descrição: {}", categoria.getDescricao());
+            throw new CategoriaExistenteException("Já existe uma categoria com a descrição: " + categoria.getDescricao());
+        }
+
         return categoriaRepository.save(categoria);
     }
 
@@ -54,6 +61,22 @@ public class CategoriaService {
         } else {
             logger.error("Categoria não encontrada para o ID: {}", id);
             throw new CategoriaNaoEncontradaException("Categoria não encontrada para o ID: " + id);
+        }
+    }
+
+    public class CategoriaExistenteException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public CategoriaExistenteException() {
+            super();
+        }
+
+        public CategoriaExistenteException(String message) {
+            super(message);
+        }
+
+        public CategoriaExistenteException(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 

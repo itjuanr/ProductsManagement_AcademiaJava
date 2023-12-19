@@ -13,7 +13,7 @@ import com.ufn.ProductsManagement.DTO.ItemPedidoDTO;
 import com.ufn.ProductsManagement.service.ItemPedidoService;
 
 @RestController
-@RequestMapping("/api/item-pedidos")
+@RequestMapping("/item-pedidos")
 public class ItemPedidoController {
 
 	@Autowired

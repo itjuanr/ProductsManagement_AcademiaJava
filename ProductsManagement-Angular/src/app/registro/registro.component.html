@@ -1,0 +1,17 @@
+<form [formGroup]="registroForm" (ngSubmit)="registrar()">
+    <label>Username:</label>
+    <input formControlName="username" required>
+  
+    <label>Email:</label>
+    <input formControlName="email" type="email" required>
+  
+    <label>Password:</label>
+    <input formControlName="password" type="password" required>
+  
+    <button type="submit">Registrar</button>
+  </form>
+  
+  <div *ngIf="registroError" class="error-message">
+    {{ registroError }}
+  </div>
+  

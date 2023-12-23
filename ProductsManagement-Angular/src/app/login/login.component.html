@@ -1,0 +1,21 @@
+<form [formGroup]="loginForm" (ngSubmit)="login()" class="login-container">
+  <label>Username:</label>
+  <input formControlName="username" required>
+  <div *ngIf="loginForm.get('username')?.hasError('required') && loginForm.get('username')?.touched">
+    Campo obrigatório.
+  </div>
+
+  <label>Password:</label>
+  <input formControlName="password" type="password" required>
+  <div *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched">
+    Campo obrigatório.
+  </div>
+
+  <button type="submit">Login</button>
+
+  <button (click)="redirectToRegistration()" class="register-button">Registrar</button>
+</form>
+
+<div *ngIf="loginError" class="error-message">
+  {{ loginError }}
+</div>

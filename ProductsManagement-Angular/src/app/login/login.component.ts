@@ -1,5 +1,3 @@
-// login.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
@@ -26,7 +24,7 @@ export class LoginComponent implements OnInit {
 
   initializeForm() {
     this.loginForm = this.formBuilder.group({
-      username: ['', Validators.required],
+      login: ['', Validators.required],  
       password: ['', Validators.required]
     });
   }
@@ -35,15 +33,15 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.loginForm.value).subscribe(
       () => {
         this.router.navigate(['/dashboard']);
+        console.log('Login bem-sucedido!');
       },
       (error) => {
-        this.loginError = this.authService.handleLoginError(error);
-        console.error(error);
+        this.loginError = error.message || 'Erro ao fazer login. Verifique suas credenciais.';
       }
     );
   }
 
   redirectToRegistration() {
-    this.router.navigate(['/registro']);
+    this.router.navigate(['/auth/registro']);
   }
 }

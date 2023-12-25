@@ -1,13 +1,13 @@
 <form [formGroup]="loginForm" (ngSubmit)="login()" class="login-container">
-  <label>Username:</label>
-  <input formControlName="username" required>
-  <div *ngIf="loginForm.get('username')?.hasError('required') && loginForm.get('username')?.touched">
+  <label>Login:</label>
+  <input formControlName="login" required>
+  <div *ngIf="loginForm.get('login')?.hasError('required') && loginForm.get('login')?.touched" class="error-message">
     Campo obrigatório.
   </div>
 
   <label>Password:</label>
   <input formControlName="password" type="password" required>
-  <div *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched">
+  <div *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched" class="error-message">
     Campo obrigatório.
   </div>
 
@@ -15,7 +15,3 @@
 
   <button (click)="redirectToRegistration()" class="register-button">Registrar</button>
 </form>
-
-<div *ngIf="loginError" class="error-message">
-  {{ loginError }}
-</div>

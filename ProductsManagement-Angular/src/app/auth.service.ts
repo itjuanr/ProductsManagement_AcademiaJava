@@ -1,9 +1,9 @@
-// auth.service.ts
-
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
+import { LoginResponse } from './login-response.model';
+import { LoginErrorResponse } from './login-error-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -18,19 +18,31 @@ export class AuthService {
     return this.tokenSubject.value;
   }
 
-  login(credentials: { username: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
-      tap((response: any) => {
-        const token = response.token;
+  login(credentials: { login: string; password: string }): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials, {
+      withCredentials: true,
+    }).pipe(
+      tap(response => {
+        const token = response?.token;
+        console.log('Token recebido:', token);
         if (token) {
           this.saveToken(token);
         }
       }),
-      catchError(this.handleError)
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 404) {
+          const loginError: LoginErrorResponse = error.error;
+          console.error('Erro ao fazer login:', loginError.message);
+          return throwError(loginError);
+        } else {
+          console.error('Erro na requisição:', error);
+          return throwError(error);
+        }
+      })
     );
   }
-
-  registrar(registrationData: { username: string; email: string; password: string }): Observable<any> {
+  
+  registrar(registrationData: { login: string; email: string; password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, registrationData);
   }
 
@@ -40,6 +52,7 @@ export class AuthService {
 
   private saveToken(token: string): void {
     localStorage.setItem('token', token);
+    console.log('Token salvo:', token);
     this.tokenSubject.next(token);
   }
 
@@ -48,15 +61,18 @@ export class AuthService {
     this.tokenSubject.next(null);
   }
 
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    console.error('Erro na requisição:', error);
+    return throwError(error);
+  }
+
   handleLoginError(error: HttpErrorResponse): string {
     if (error.status === 401) {
       return 'Credenciais inválidas. Verifique suas informações.';
+    } else if (error.status === 403) {
+      return 'Acesso proibido. Verifique suas permissões.';
     } else {
       return 'Erro ao fazer login. Verifique suas credenciais.';
     }
-  }
-
-  private handleError(error: HttpErrorResponse): Observable<never> {
-    return throwError(error);
   }
 }

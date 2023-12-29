@@ -1,0 +1,46 @@
+<div>
+  <h2>Clientes</h2>
+  <button routerLink="/dashboard">Voltar para o Dashboard</button>
+  <div>
+    <h3>{{ isNewCliente ? 'Novo Cliente' : 'Editar Cliente' }}</h3>
+    <form (submit)="createOrUpdateCliente()">
+      <label for="nome">Nome:</label>
+      <input type="text" id="nome" name="nome" [(ngModel)]="newCliente.nome" required>
+
+      <label for="cpf">CPF:</label>
+      <input type="text" id="cpf" name="cpf" [(ngModel)]="newCliente.cpf" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" [(ngModel)]="newCliente.email" required>
+
+      <button type="submit">{{ isNewCliente ? 'Adicionar Cliente' : 'Salvar Edição' }}</button>
+    </form>
+  </div>
+
+  <div>
+    <h3>Lista de Clientes</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Email</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cliente of clientes">
+          <td>{{ cliente.id }}</td>
+          <td>{{ cliente.nome }}</td>
+          <td>{{ cliente.cpf }}</td>
+          <td>{{ cliente.email }}</td>
+          <td>
+            <button (click)="editCliente(cliente)">Editar</button>
+            <button (click)="deleteCliente(cliente.id)">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

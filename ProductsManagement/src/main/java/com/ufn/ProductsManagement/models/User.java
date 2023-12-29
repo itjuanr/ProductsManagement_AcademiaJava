@@ -23,6 +23,8 @@ public class User implements UserDetails {
 	@Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+	
+	@Column(name = "login") 
     private String login;
     private String password;
     private UserRole role;

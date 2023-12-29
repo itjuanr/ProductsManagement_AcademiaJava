@@ -1,0 +1,42 @@
+<div>
+    <h2>Categorias</h2>
+    <button routerLink="/dashboard">Voltar para o Dashboard</button>
+    <div>
+      <h3>{{ isNewCategoria ? 'Nova Categoria' : 'Editar Categoria' }}</h3>
+      <form (submit)="createOrUpdateCategoria()">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" [(ngModel)]="novaCategoria.nome" required>
+  
+        <label for="descricao">Descrição:</label>
+        <input type="text" id="descricao" name="descricao" [(ngModel)]="novaCategoria.descricao" required>
+  
+        <button type="submit">{{ isNewCategoria ? 'Adicionar Categoria' : 'Salvar Edição' }}</button>
+      </form>
+    </div>
+  
+    <div>
+      <h3>Lista de Categorias</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let categoria of categorias">
+            <td>{{ categoria.id }}</td>
+            <td>{{ categoria.nome }}</td>
+            <td>{{ categoria.descricao }}</td>
+            <td>
+              <button (click)="editCategoria(categoria)">Editar</button>
+              <button (click)="deleteCategoria(categoria.id)">Excluir</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  

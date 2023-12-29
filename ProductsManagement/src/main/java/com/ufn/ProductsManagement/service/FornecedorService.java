@@ -8,6 +8,7 @@ import com.ufn.ProductsManagement.models.Fornecedor;
 import com.ufn.ProductsManagement.repository.FornecedorRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class FornecedorService {
@@ -30,6 +31,18 @@ public class FornecedorService {
         logger.info("Salvando novo fornecedor: {}", fornecedor);
         validarFornecedor(fornecedor);
         return fornecedorRepository.save(fornecedor);
+    }
+    
+    public Fornecedor update(Long id, Fornecedor fornecedorAtualizado) {
+        logger.info("Atualizando fornecedor por ID: {}", id);
+        Fornecedor fornecedorExistente = fornecedorRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Fornecedor não encontrado com o ID: " + id));
+
+        fornecedorExistente.setNome(fornecedorAtualizado.getNome());
+        fornecedorExistente.setCnpj(fornecedorAtualizado.getCnpj());
+
+        validarFornecedor(fornecedorExistente);
+        return fornecedorRepository.save(fornecedorExistente);
     }
 
     public void deleteById(Long id) {

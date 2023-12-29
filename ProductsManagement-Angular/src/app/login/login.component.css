@@ -18,7 +18,7 @@ form {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: auto; /* Adicione esta linha para centralizar horizontalmente */
+  margin: auto; 
 }
 
 input {
@@ -44,7 +44,7 @@ button.register-button {
   margin-top: 10px;
 }
 
-form div {
+form div, .error-message, .success-message {
   color: #ff0000;
   text-align: center;
   margin-top: 5px;
@@ -52,6 +52,12 @@ form div {
 
 .error-message {
   color: #ff0000;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.success-message {
+  color: #008000; 
   text-align: center;
   margin-top: 10px;
 }

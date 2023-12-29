@@ -1,4 +1,7 @@
+<!-- Seu template HTML (login.component.html) -->
+
 <form [formGroup]="loginForm" (ngSubmit)="login()" class="login-container">
+
   <label>Login:</label>
   <input formControlName="login" required>
   <div *ngIf="loginForm.get('login')?.hasError('required') && loginForm.get('login')?.touched" class="error-message">
@@ -14,4 +17,12 @@
   <button type="submit">Login</button>
 
   <button (click)="redirectToRegistration()" class="register-button">Registrar</button>
+
+  <div *ngIf="loginError" class="error-message">
+    {{ loginError }}
+  </div>
+
+  <div *ngIf="loginSuccess" class="success-message">
+    {{ loginSuccess }}
+  </div>
 </form>

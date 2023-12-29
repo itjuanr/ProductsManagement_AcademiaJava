@@ -4,6 +4,8 @@ import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { LoginResponse } from './login-response.model';
 import { LoginErrorResponse } from './login-error-response.model';
+import { MessageService } from './message.service';
+import { Router } from '@angular/router'; 
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +14,7 @@ export class AuthService {
   private apiUrl = 'http://localhost:8080/auth';
   private tokenSubject = new BehaviorSubject<string | null>(localStorage.getItem('token'));
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private messageService: MessageService, private router: Router) {}
 
   get token(): string | null {
     return this.tokenSubject.value;
@@ -27,15 +29,18 @@ export class AuthService {
         console.log('Token recebido:', token);
         if (token) {
           this.saveToken(token);
+          this.messageService.showMessage({ text: 'Login bem-sucedido!', type: 'success' });
         }
       }),
       catchError((error: HttpErrorResponse) => {
         if (error.status === 404) {
           const loginError: LoginErrorResponse = error.error;
           console.error('Erro ao fazer login:', loginError.message);
+          this.messageService.showMessage({ text: loginError.message, type: 'error' });
           return throwError(loginError);
         } else {
           console.error('Erro na requisição:', error);
+          this.messageService.showMessage({ text: 'Erro ao fazer login. Verifique suas credenciais.', type: 'error' });
           return throwError(error);
         }
       })
@@ -43,11 +48,22 @@ export class AuthService {
   }
   
   registrar(registrationData: { login: string; email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, registrationData);
+    const payload = { ...registrationData, role: 'USER' };
+    return this.http.post(`${this.apiUrl}/register`, payload).pipe(
+      tap(() => {
+        this.messageService.showMessage({ text: 'Registro bem-sucedido!', type: 'success' });
+      }),
+      catchError((error: HttpErrorResponse) => {
+        console.error('Erro no registro:', error);
+        this.messageService.showMessage({ text: 'Erro ao registrar. Verifique suas informações.', type: 'error' });
+        return throwError(error);
+      })
+    );
   }
 
   logout(): void {
     this.removeToken();
+    this.router.navigate(['/auth/login']); 
   }
 
   private saveToken(token: string): void {

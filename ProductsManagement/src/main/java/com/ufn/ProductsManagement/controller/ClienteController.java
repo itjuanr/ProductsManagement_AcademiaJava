@@ -37,6 +37,20 @@ public class ClienteController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<ClienteDTO> updateCliente(
+            @PathVariable Long id,
+            @RequestBody ClienteDTO clienteDTO) {
+        try {
+            ClienteDTO updatedClienteDTO = clienteService.update(id, clienteDTO);
+            return ResponseEntity.ok(updatedClienteDTO);
+        } catch (ClienteService.ClienteNaoEncontradoException e) {
+            return ResponseEntity.notFound().build();
+        } catch (ClienteService.ClienteEmailDuplicadoException | ClienteService.ClienteCpfDuplicadoException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCliente(@PathVariable Long id) {

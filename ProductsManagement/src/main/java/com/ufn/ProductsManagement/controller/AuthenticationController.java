@@ -40,10 +40,9 @@ public class AuthenticationController {
 	        var token = tokenService.generateToken((User) auth.getPrincipal());
 	        return ResponseEntity.ok(new LoginResponseDTO(token));
 	    } catch (BadCredentialsException ex) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 	    }
 	}
-
 
 	@PostMapping("/register")
 	public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {

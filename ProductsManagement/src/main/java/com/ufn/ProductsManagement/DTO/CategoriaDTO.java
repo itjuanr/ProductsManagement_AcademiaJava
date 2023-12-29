@@ -4,7 +4,6 @@ public class CategoriaDTO {
     private Long id;
     private String nome;
     private String descricao;
-    private int quantidadeProdutos;
 
     public Long getId() {
         return id;
@@ -28,13 +27,5 @@ public class CategoriaDTO {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
-    }
-
-    public int getQuantidadeProdutos() {
-        return quantidadeProdutos;
-    }
-
-    public void setQuantidadeProdutos(int quantidadeProdutos) {
-        this.quantidadeProdutos = quantidadeProdutos;
     }
 }

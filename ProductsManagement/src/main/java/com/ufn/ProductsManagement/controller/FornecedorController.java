@@ -40,10 +40,13 @@ public class FornecedorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Fornecedor> updateFornecedor(@PathVariable Long id, @RequestBody Fornecedor fornecedor) {
-        fornecedor.setId(id);
-        Fornecedor fornecedorAtualizado = fornecedorService.save(fornecedor);
-        return ResponseEntity.ok(fornecedorAtualizado);
+    public ResponseEntity<Fornecedor> update(@PathVariable Long id, @RequestBody Fornecedor fornecedor) {
+        Fornecedor fornecedorAtualizado = fornecedorService.update(id, fornecedor);
+        if (fornecedorAtualizado != null) {
+            return ResponseEntity.ok(fornecedorAtualizado);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")

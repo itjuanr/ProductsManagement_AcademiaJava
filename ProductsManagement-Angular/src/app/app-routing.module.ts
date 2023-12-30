@@ -7,6 +7,7 @@ import { ClienteComponent } from './cliente/cliente.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CategoriaComponent } from './categoria/categoria.component';
 import { FornecedorComponent } from './fornecedor/fornecedor.component';
+import { ProdutoComponent } from './produto/produto.component';
 
 const routes: Routes = [
   { path: 'auth/login', component: LoginComponent }, 
@@ -15,6 +16,7 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'categoria', component: CategoriaComponent }, 
   { path: 'fornecedor', component: FornecedorComponent },
+  { path: 'produto', component: ProdutoComponent },
   { path: '**', redirectTo: '/auth/login', pathMatch: 'full' },
 
 ];

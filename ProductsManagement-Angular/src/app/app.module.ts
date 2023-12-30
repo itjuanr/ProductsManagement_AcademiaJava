@@ -14,6 +14,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthGuard } from './auth.guard';
 import { CategoriaComponent } from './categoria/categoria.component';
 import { FornecedorComponent } from './fornecedor/fornecedor.component';
+import { ProdutoComponent } from './produto/produto.component';
 import { RouterModule } from '@angular/router';
 
 @NgModule({
@@ -24,7 +25,8 @@ import { RouterModule } from '@angular/router';
     ClienteComponent,
     DashboardComponent,
     CategoriaComponent,
-    FornecedorComponent
+    FornecedorComponent,
+    ProdutoComponent
   ],
   imports: [
     BrowserModule,

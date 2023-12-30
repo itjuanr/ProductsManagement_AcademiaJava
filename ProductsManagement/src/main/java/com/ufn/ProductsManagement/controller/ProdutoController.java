@@ -47,6 +47,13 @@ public class ProdutoController {
     }
 
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ProdutoDTO> updateProduto(@PathVariable Long id,
+                                                    @RequestBody ProdutoDTO produtoDTO) {
+        ProdutoDTO updatedProdutoDTO = produtoService.update(id, produtoDTO);
+        return new ResponseEntity<>(updatedProdutoDTO, HttpStatus.OK);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduto(@PathVariable Long id) {

@@ -1,8 +1,7 @@
-// fornecedor.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { Fornecedor } from './fornecedor';
 import { AuthService } from '../auth.service';
 
@@ -24,14 +23,24 @@ export class FornecedorService {
     });
   }
 
-  getAllFornecedores(): void {
+  private getAllFornecedoresFromServer(): Observable<Fornecedor[]> {
     const headers = this.getHeaders();
-    this.http.get<Fornecedor[]>(this.apiUrl, { headers }).subscribe(
-      (fornecedores) => {
-        this.fornecedoresSubject.next(fornecedores);
-      },
-      (error) => {
+    return this.http.get<Fornecedor[]>(this.apiUrl, { headers }).pipe(
+      catchError((error) => {
         console.error('Erro ao obter fornecedores:', error);
+        throw error;
+      })
+    );
+  }
+
+  private emitChanges(fornecedores: Fornecedor[]): void {
+    this.fornecedoresSubject.next([...fornecedores]);
+  }
+
+  getAllFornecedores(): void {
+    this.getAllFornecedoresFromServer().subscribe(
+      (fornecedores) => {
+        this.emitChanges(fornecedores);
       }
     );
   }
@@ -43,24 +52,34 @@ export class FornecedorService {
 
   addFornecedor(fornecedor: Fornecedor): Observable<Fornecedor> {
     const headers = this.getHeaders();
-    return this.http.post<Fornecedor>(this.apiUrl, fornecedor, { headers });
+    return this.http.post<Fornecedor>(this.apiUrl, fornecedor, { headers }).pipe(
+      catchError((error) => {
+        console.error('Erro ao adicionar fornecedor:', error);
+        throw error;
+      })
+    );
   }
 
-  updateFornecedor(id: number, fornecedor: Fornecedor | null): Observable<Fornecedor> {
+  updateFornecedor(id: number, fornecedor: Fornecedor | null): Observable<Fornecedor[]> {
     const headers = this.getHeaders();
     console.log('Dados a serem enviados para atualização:', fornecedor);
-    return this.http.put<Fornecedor>(`${this.apiUrl}/${id}`, fornecedor, { headers })
-      .pipe(
-        catchError((error) => {
-          console.error('Erro na atualização do fornecedor:', error);
-          throw error;
-        })
-      );
+    return this.http.put<Fornecedor>(`${this.apiUrl}/${id}`, fornecedor, { headers }).pipe(
+      switchMap(() => this.getAllFornecedoresFromServer()),
+      catchError((error) => {
+        console.error('Erro na atualização do fornecedor:', error);
+        throw error;
+      })
+    );
   }
-  
 
-  deleteFornecedor(id: number): Observable<void> {
+  deleteFornecedor(id: number): Observable<Fornecedor[]> {
     const headers = this.getHeaders();
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers });
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers }).pipe(
+      switchMap(() => this.getAllFornecedoresFromServer()),
+      catchError((error) => {
+        console.error('Erro ao excluir fornecedor:', error);
+        throw error;
+      })
+    );
   }
 }

@@ -1,0 +1,57 @@
+<!-- produto.component.html -->
+
+<div class="container">
+    <h2>Produtos</h2>
+    <button routerLink="/dashboard" class="back-button">Voltar para o Dashboard</button>
+  
+    <div class="form-section">
+      <h3>{{ modoEdicao ? 'Editar Produto' : 'Novo Produto' }}</h3>
+      <form (submit)="salvarProduto()" class="produto-form">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" [(ngModel)]="novoProduto.nome" required>
+  
+        <label for="preco">Preço:</label>
+        <input type="number" id="preco" name="preco" [(ngModel)]="novoProduto.preco" required>
+  
+        <label for="categoriaId">ID da Categoria:</label>
+        <input type="number" id="categoriaId" name="categoriaId" [(ngModel)]="novoProduto.categoriaId" required>
+  
+        <label for="fornecedorId">ID do Fornecedor:</label>
+        <input type="number" id="fornecedorId" name="fornecedorId" [(ngModel)]="novoProduto.fornecedorId" required>
+  
+        <button type="submit" class="action-button">
+          {{ modoEdicao ? 'Salvar Edição' : 'Adicionar Produto' }}
+        </button>
+      </form>
+    </div>
+  
+    <div class="list-section">
+      <h3>Lista de Produtos</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Preço</th>
+            <th>Categoria ID</th>
+            <th>Fornecedor ID</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let produto of produtos">
+            <td>{{ produto.id }}</td>
+            <td>{{ produto?.nome }}</td>
+            <td>{{ produto?.preco }}</td>
+            <td>{{ produto?.categoriaId }}</td>
+            <td>{{ produto?.fornecedorId }}</td>
+            <td>
+              <button (click)="editarProduto(produto)" class="edit-button">Editar</button>
+              <button (click)="excluirProduto(produto.id)" class="delete-button">Excluir</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  

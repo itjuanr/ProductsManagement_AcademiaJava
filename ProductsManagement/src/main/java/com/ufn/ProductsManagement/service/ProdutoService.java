@@ -83,6 +83,30 @@ public class ProdutoService {
 		}
 	}
 
+	public ProdutoDTO update(Long id, ProdutoDTO produtoDTO) {
+		logger.info("Atualizando produto com ID: {}, DTO: {}", id, produtoDTO);
+
+		Produto existingProduto = produtoRepository.findById(id)
+				.orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado"));
+
+		existingProduto.setNome(produtoDTO.getNome());
+		existingProduto.setPreco(produtoDTO.getPreco());
+
+		if (produtoDTO.getCategoriaId() != null) {
+			existingProduto.setCategoria(categoriaService.findById(produtoDTO.getCategoriaId()));
+		}
+
+		if (produtoDTO.getFornecedorId() != null) {
+			existingProduto.setFornecedor(fornecedorService.findById(produtoDTO.getFornecedorId()));
+		}
+
+		logger.info("Produto antes de atualizar: {}", existingProduto);
+		Produto updatedProduto = produtoRepository.save(existingProduto);
+		logger.info("Produto após atualizar: {}", updatedProduto);
+
+		return toDTO(updatedProduto);
+	}
+
 	public ProdutoDTO toDTO(Produto produto) {
 		logger.info("Convertendo Produto para ProdutoDTO: {}", produto);
 		ProdutoDTO produtoDTO = new ProdutoDTO();
@@ -122,6 +146,22 @@ public class ProdutoService {
 		}
 
 		public CategoriaOuFornecedorNaoEncontradoException(String message, Throwable cause) {
+			super(message, cause);
+		}
+	}
+
+	public class ProdutoNaoEncontradoException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+
+		public ProdutoNaoEncontradoException() {
+			super();
+		}
+
+		public ProdutoNaoEncontradoException(String message) {
+			super(message);
+		}
+
+		public ProdutoNaoEncontradoException(String message, Throwable cause) {
 			super(message, cause);
 		}
 	}

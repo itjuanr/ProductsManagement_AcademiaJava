@@ -1,5 +1,4 @@
-// fornecedor.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FornecedorService } from './fornecedor.service';
 import { Fornecedor } from './fornecedor';
 
@@ -11,9 +10,9 @@ import { Fornecedor } from './fornecedor';
 export class FornecedorComponent implements OnInit {
   fornecedores: Fornecedor[] = [];
   novoFornecedor: Fornecedor = { id: 0, nome: '', cnpj: '' };
-  editarFornecedor: Fornecedor | null = null
+  editarFornecedor: Fornecedor | null = null;
 
-  constructor(private fornecedorService: FornecedorService) {}
+  constructor(private fornecedorService: FornecedorService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.getAllFornecedores();
@@ -33,34 +32,37 @@ export class FornecedorComponent implements OnInit {
 
   createOrUpdateFornecedor(): void {
     if (this.editarFornecedor) {
-      // Atualizar fornecedor existente
       const updatedFornecedor: Fornecedor = {
-        ...this.editarFornecedor,
-        nome: this.novoFornecedor?.nome || '',
-        cnpj: this.novoFornecedor?.cnpj || '',
+        id: this.editarFornecedor.id,
+        nome: this.novoFornecedor.nome || '',
+        cnpj: this.novoFornecedor.cnpj || '',
       };
-  
+
       this.fornecedorService.updateFornecedor(this.editarFornecedor.id, updatedFornecedor)
         .subscribe(
-          (fornecedor) => {
-            const index = this.fornecedores.findIndex(f => f.id === fornecedor.id);
-            this.fornecedores[index] = fornecedor;
-            this.resetForm();
+          () => {
+            const index = this.fornecedores.findIndex(f => f.id === this.editarFornecedor!.id);
+            if (index !== -1) {
+              this.fornecedores[index] = updatedFornecedor;
+              this.resetForm();
+            }
           },
           (error) => {
             console.error('Erro ao editar fornecedor:', error);
           }
         );
-    } else if (this.novoFornecedor) {
-      // Adicionar novo fornecedor
-      this.fornecedorService.addFornecedor(this.novoFornecedor).subscribe(
-        (fornecedor) => {
-          this.resetForm();
-        },
-        (error) => {
-          console.error('Erro ao adicionar fornecedor:', error);
-        }
-      );
+    } else {
+      if (this.novoFornecedor.nome && this.novoFornecedor.cnpj) {
+        this.fornecedorService.addFornecedor(this.novoFornecedor).subscribe(
+          (fornecedor) => {
+            this.fornecedores.push(fornecedor);
+            this.resetForm();
+          },
+          (error) => {
+            console.error('Erro ao adicionar fornecedor:', error);
+          }
+        );
+      }
     }
   }
 
@@ -72,6 +74,7 @@ export class FornecedorComponent implements OnInit {
   deleteFornecedor(id: number): void {
     this.fornecedorService.deleteFornecedor(id).subscribe(
       () => {
+        this.fornecedores = this.fornecedores.filter(f => f.id !== id);
         this.resetForm();
       },
       (error) => {
@@ -82,5 +85,7 @@ export class FornecedorComponent implements OnInit {
 
   resetForm(): void {
     this.editarFornecedor = null;
+    this.novoFornecedor = { id: 0, nome: '', cnpj: '' };
+    this.cdr.detectChanges();
   }
 }

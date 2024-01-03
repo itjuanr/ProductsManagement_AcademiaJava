@@ -1,4 +1,12 @@
-/* fornecedor.component.css */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  width: 80%;
+  margin: 20px auto;
+}
 
 div {
   font-family: 'Arial', sans-serif;
@@ -26,7 +34,7 @@ label {
 
 input {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   margin-bottom: 10px;
   box-sizing: border-box;
 }
@@ -34,11 +42,11 @@ input {
 button {
   background-color: #337ab7;
   color: #fff;
-  padding: 10px 15px;
+  padding: 12px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px;
+  margin-right: 5px;
 }
 
 button:hover {
@@ -52,7 +60,7 @@ table {
 }
 
 th, td {
-  padding: 10px;
+  padding: 15px;
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
@@ -65,13 +73,39 @@ th {
 .edit-button, .delete-button {
   background-color: #337ab7;
   color: #fff;
-  padding: 5px 10px;
+  padding: 8px 15px;
   border: none;
-  border-radius: 3px;
+  border-radius: 5px;
   cursor: pointer;
   margin-right: 5px;
 }
 
 .edit-button:hover, .delete-button:hover {
   background-color: #286090;
+}
+
+@media (max-width: 600px) {
+  div {
+    padding: 15px;
+  }
+
+  input {
+    padding: 8px;
+  }
+
+  button {
+    padding: 10px 15px;
+  }
+
+  th, td {
+    padding: 10px;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+  }
+
+
+  .edit-button, .delete-button {
+    display: flex;
+  }
 }

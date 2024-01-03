@@ -1,24 +1,22 @@
-<!-- fornecedor.component.html -->
-
 <div class="container">
   <h2>Fornecedores</h2>
   <button routerLink="/dashboard" class="back-button">Voltar para o Dashboard</button>
 
   <div class="form-section">
-    <h3>{{ editarFornecedor ? 'Editar Fornecedor' : 'Novo Fornecedor' }}</h3>
+    <h3>{{ isNewFornecedor ? 'Novo Fornecedor' : 'Editar Fornecedor' }}</h3>
     <form (submit)="createOrUpdateFornecedor()" class="fornecedor-form">
       <label for="nome">Nome:</label>
-      <input type="text" id="nome" name="nome" [(ngModel)]="novoFornecedor.nome" required>
-  
+      <input type="text" id="nome" name="nome" [(ngModel)]="newFornecedor.nome" required>
+
       <label for="cnpj">CNPJ:</label>
-      <input type="text" id="cnpj" name="cnpj" [(ngModel)]="novoFornecedor.cnpj" required>
-  
-      <button type="submit" class="action-button">
-        {{ editarFornecedor ? 'Salvar Edição' : 'Adicionar Fornecedor' }}
-      </button>
+      <input type="text" id="cnpj" name="cnpj" [(ngModel)]="newFornecedor.cnpj" mask="00.000.000/0000-00" required>
+
+      <div class="button-container">
+        <button type="submit" class="action-button">{{ isNewFornecedor ? 'Adicionar Fornecedor' : 'Salvar Edição' }}</button>
+        <button type="button" class="action-button cancel-button" *ngIf="isEditing" (click)="discardChanges()">Cancelar Edição</button>
+      </div>
     </form>
   </div>
-  
 
   <div class="list-section">
     <h3>Lista de Fornecedores</h3>

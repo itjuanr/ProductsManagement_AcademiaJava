@@ -1,0 +1,69 @@
+<!-- pedido.component.html -->
+
+<div class="container">
+    <h2>Pedidos</h2>
+    <button routerLink="/dashboard" class="back-button">Voltar para o Dashboard</button>
+  
+    <div class="form-section">
+      <h3>{{ pedidoSelecionado ? 'Editar Pedido' : 'Novo Pedido' }}</h3>
+      <form *ngIf="!pedidoSelecionado" (submit)="criarPedido()" class="pedido-form">
+        <label for="clienteId">ID do Cliente:</label>
+        <input type="number" id="clienteId" name="clienteId" [(ngModel)]="novoPedido.clienteId" required>
+  
+        <label for="produtoId">ID do Produto:</label>
+        <input type="number" id="produtoId" name="produtoId" [(ngModel)]="novoPedido.produtoId" required>
+  
+        <label for="quantidade">Quantidade:</label>
+        <input type="number" id="quantidade" name="quantidade" [(ngModel)]="novoPedido.quantidade" required>
+  
+        <button type="submit" class="action-button">Adicionar Pedido</button>
+      </form>
+  
+      <form *ngIf="pedidoSelecionado" (submit)="atualizarPedido(pedidoSelecionado)">
+        <label for="novaQuantidade">Nova Quantidade:</label>
+        <input type="number" id="novaQuantidade" name="novaQuantidade" [(ngModel)]="pedidoSelecionado.quantidade">
+  
+        <label for="novoIdCliente">Novo ID do Cliente:</label>
+        <input type="number" id="novoIdCliente" name="novoIdCliente" [(ngModel)]="pedidoSelecionado.clienteId">
+  
+        <label for="novoIdProduto">Novo ID do Produto:</label>
+        <input type="number" id="novoIdProduto" name="novoIdProduto" [(ngModel)]="pedidoSelecionado.produtoId">
+  
+        <button type="submit" class="action-button">Salvar Edição</button>
+      </form>
+    </div>
+  
+    <div class="list-section">
+      <h3>Lista de Pedidos</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cliente ID</th>
+            <th>Cliente Nome</th>
+            <th>Produto ID</th>
+            <th>Produto Nome</th>
+            <th>Quantidade</th>
+            <th>Preço</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pedido of pedidos">
+            <td>{{ pedido.idPedido }}</td>
+            <td>{{ pedido?.clienteId }}</td>
+            <td>{{ pedido?.clienteNome }}</td>
+            <td>{{ pedido?.produtoId }}</td>
+            <td>{{ pedido?.produtoNome }}</td>
+            <td>{{ pedido?.quantidade }}</td>
+            <td>{{ pedido?.preco }}</td>
+            <td>
+             <!-- <button (click)="selecionarPedido(pedido)" class="edit-button">Editar</button>-->
+              <button (click)="excluirPedido()" class="delete-button">Excluir</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  

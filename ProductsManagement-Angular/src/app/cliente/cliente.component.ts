@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ClienteService } from './cliente.service';
 import { Cliente } from './cliente';
+import { ConfirmDialogComponent } from '../confirm-dialog.component';
 
 @Component({
   selector: 'app-cliente',
@@ -11,8 +13,9 @@ export class ClienteComponent implements OnInit {
   clientes: Cliente[] = [];
   newCliente: Cliente = { id: 0, nome: '', cpf: '', email: '' };
   isNewCliente: boolean = true;
+  isEditing: boolean = false;
 
-  constructor(private clienteService: ClienteService) {}
+  constructor(private clienteService: ClienteService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.loadClientes();
@@ -28,8 +31,20 @@ export class ClienteComponent implements OnInit {
     if (this.isNewCliente) {
       this.createCliente();
     } else {
-      this.updateCliente();
+      this.openConfirmationDialog('Deseja salvar as alterações no cliente?', this.updateCliente.bind(this));
     }
+  }
+
+  openConfirmationDialog(message: string, callback: () => void): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: { title: 'Confirmação', message: message },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        callback();
+      }
+    });
   }
 
   createCliente(): void {
@@ -47,18 +62,38 @@ export class ClienteComponent implements OnInit {
   }
 
   editCliente(cliente: Cliente): void {
-    this.newCliente = { ...cliente };
-    this.isNewCliente = false;
+    if (this.isEditing) {
+      this.openConfirmationDialog('Deseja descartar as alterações no cliente?', () => {
+        this.newCliente = { ...cliente };
+        this.isNewCliente = false;
+        this.isEditing = true;
+      });
+    } else {
+      this.newCliente = { ...cliente };
+      this.isNewCliente = false;
+      this.isEditing = true;
+    }
+  }
+
+  cancelEdit(): void {
+    this.openConfirmationDialog('Deseja descartar as alterações no cliente?', () => {
+      this.resetForm();
+      this.isEditing = false;
+    });
+  }
+
+  deleteCliente(id: number): void {
+    this.openConfirmationDialog('Deseja excluir este cliente?', () => {
+      this.clienteService.deleteCliente(id).subscribe(() => {
+        this.loadClientes();
+        this.resetForm();
+        this.isEditing = false;
+      });
+    });
   }
 
   resetForm(): void {
     this.newCliente = { id: 0, nome: '', cpf: '', email: '' };
     this.isNewCliente = true;
-  }
-
-  deleteCliente(id: number): void {
-    this.clienteService.deleteCliente(id).subscribe(() => {
-      this.loadClientes();
-    });
   }
 }

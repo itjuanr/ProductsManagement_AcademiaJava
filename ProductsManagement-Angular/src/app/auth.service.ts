@@ -6,6 +6,8 @@ import { LoginResponse } from './login-response.model';
 import { LoginErrorResponse } from './login-error-response.model';
 import { MessageService } from './message.service';
 import { Router } from '@angular/router'; 
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from './confirm-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +16,12 @@ export class AuthService {
   private apiUrl = 'http://localhost:8080/auth';
   private tokenSubject = new BehaviorSubject<string | null>(localStorage.getItem('token'));
 
-  constructor(private http: HttpClient, private messageService: MessageService, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private messageService: MessageService,
+    private router: Router,
+    private dialog: MatDialog 
+  ) {}
 
   get token(): string | null {
     return this.tokenSubject.value;
@@ -62,8 +69,12 @@ export class AuthService {
   }
 
   logout(): void {
-    this.removeToken();
-    this.router.navigate(['/auth/login']); 
+    this.openConfirmationDialog('Deseja realmente sair?').subscribe((result) => {
+      if (result) {
+        this.removeToken();
+        this.router.navigate(['/auth/login']);
+      }
+    });
   }
 
   private saveToken(token: string): void {
@@ -90,5 +101,13 @@ export class AuthService {
     } else {
       return 'Erro ao fazer login. Verifique suas credenciais.';
     }
+  }
+
+  private openConfirmationDialog(message: string): Observable<boolean> {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: { title: 'Confirmação', message: message },
+    });
+
+    return dialogRef.afterClosed();
   }
 }

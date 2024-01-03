@@ -15,7 +15,13 @@ import { AuthGuard } from './auth.guard';
 import { CategoriaComponent } from './categoria/categoria.component';
 import { FornecedorComponent } from './fornecedor/fornecedor.component';
 import { ProdutoComponent } from './produto/produto.component';
+import { PedidoComponent } from './pedido/pedido.component';
 import { RouterModule } from '@angular/router';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { ConfirmDialogComponent } from './confirm-dialog.component';
+import { NgxMaskModule } from 'ngx-mask';
 
 @NgModule({
   declarations: [
@@ -26,7 +32,9 @@ import { RouterModule } from '@angular/router';
     DashboardComponent,
     CategoriaComponent,
     FornecedorComponent,
-    ProdutoComponent
+    ProdutoComponent,
+    PedidoComponent,
+    ConfirmDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +42,11 @@ import { RouterModule } from '@angular/router';
     ReactiveFormsModule, 
     HttpClientModule,
     AppRoutingModule,
-    RouterModule
+    RouterModule,
+    BrowserAnimationsModule,
+    MatDialogModule,
+    MatButtonModule,
+    NgxMaskModule.forRoot()
   ],
   providers: [MessageService, AuthGuard],
   bootstrap: [AppComponent]

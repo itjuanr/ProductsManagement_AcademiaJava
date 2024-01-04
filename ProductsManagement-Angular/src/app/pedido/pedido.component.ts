@@ -1,6 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { PedidoService } from './pedido.service';
 import { PedidoDTO, CriarPedidoRequestDTO } from './pedido';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../confirm-dialog.component';
 
 @Component({
   selector: 'app-pedido',
@@ -16,7 +18,7 @@ export class PedidoComponent implements OnInit {
   };
   pedidoSelecionado: PedidoDTO | null = null;
 
-  constructor(private pedidoService: PedidoService, private cdr: ChangeDetectorRef) {}
+  constructor(private pedidoService: PedidoService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.carregarPedidos();
@@ -24,6 +26,7 @@ export class PedidoComponent implements OnInit {
 
   carregarPedidos(): void {
     this.pedidoService.getAllPedidos().subscribe((pedidos) => {
+      console.log('Pedidos carregados:', pedidos);
       this.pedidos = pedidos;
     });
   }
@@ -38,8 +41,16 @@ export class PedidoComponent implements OnInit {
   }
 
   selecionarPedido(pedido: PedidoDTO): void {
-    this.pedidoSelecionado = pedido;
+    console.log('Pedido recebido:', pedido);
+  
+    if (pedido && pedido.idPedido !== undefined) {
+      this.pedidoSelecionado = { ...pedido };
+      console.log('Pedido Selecionado:', this.pedidoSelecionado);
+    } else {
+      console.log('Pedido ID é undefined, null ou inválido.');
+    }
   }
+  
 
   atualizarQuantidade(novaQuantidade: number): void {
     this.atualizarPedido({ novaQuantidade });
@@ -61,7 +72,7 @@ export class PedidoComponent implements OnInit {
         novoIdCliente: novoIdCliente !== undefined ? novoIdCliente : this.pedidoSelecionado.clienteId,
         novoIdProduto: novoIdProduto !== undefined ? novoIdProduto : this.pedidoSelecionado.produtoId,
       };
-  
+
       this.pedidoService.updatePedido(this.pedidoSelecionado.idPedido, atualizacaoPedido).subscribe(() => {
         this.carregarPedidos();
         this.pedidoSelecionado = null;
@@ -70,34 +81,41 @@ export class PedidoComponent implements OnInit {
   }
 
   excluirPedido(): void {
-    console.log('Excluir pedido chamado!');
-    
-    if (this.pedidoSelecionado) {
-      this.pedidoService.deletePedido(this.pedidoSelecionado.idPedido)
-        .subscribe(
+    console.log('Pedido Selecionado (antes da exclusão):', this.pedidoSelecionado);
+
+    if (this.pedidoSelecionado && this.pedidoSelecionado.idPedido !== undefined) {
+      const pedidoId = this.pedidoSelecionado.idPedido;
+      console.log('Pedido ID (antes da exclusão):', pedidoId);
+
+      this.openConfirmationDialog('Deseja excluir este pedido?', () => {
+        this.pedidoService.deletePedido(pedidoId).subscribe(
           () => {
             console.log('Pedido excluído com sucesso!');
             this.carregarPedidos();
             this.pedidoSelecionado = null;
           },
-          error => console.error('Erro na exclusão do pedido:', error)
+          (error) => {
+            console.error('Erro na exclusão do pedido:', error);
+          }
         );
+      });
     } else {
-      console.log('Nenhum pedido selecionado. Tentando excluir o último pedido da lista.');
-  
-      const ultimoPedido = this.pedidos[this.pedidos.length - 1];
-      if (ultimoPedido) {
-        this.pedidoService.deletePedido(ultimoPedido.idPedido)
-          .subscribe(
-            () => {
-              console.log('Último pedido excluído com sucesso!');
-              this.carregarPedidos();
-            },
-            error => console.error('Erro na exclusão do último pedido:', error)
-          );
-      } else {
-        console.log('Nenhum pedido disponível para exclusão.');
-      }
+      console.log('Pedido Selecionado:', this.pedidoSelecionado);
+      console.log('Pedido ID é undefined, null ou inválido.');
+      console.log('Nenhum pedido selecionado ou ID do pedido inválido.');
     }
+  }
+
+  openConfirmationDialog(message: string, callback: () => void): void {
+    console.log('Método openConfirmationDialog chamado.');
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: { title: 'Confirmação', message: message },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        callback();
+      }
+    });
   }
 }

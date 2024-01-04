@@ -80,31 +80,35 @@ export class PedidoComponent implements OnInit {
     }
   }
 
-  excluirPedido(): void {
+  excluirPedido(pedidoId?: number): void {
     console.log('Pedido Selecionado (antes da exclusão):', this.pedidoSelecionado);
-
-    if (this.pedidoSelecionado && this.pedidoSelecionado.idPedido !== undefined) {
-      const pedidoId = this.pedidoSelecionado.idPedido;
-      console.log('Pedido ID (antes da exclusão):', pedidoId);
-
-      this.openConfirmationDialog('Deseja excluir este pedido?', () => {
-        this.pedidoService.deletePedido(pedidoId).subscribe(
-          () => {
-            console.log('Pedido excluído com sucesso!');
-            this.carregarPedidos();
-            this.pedidoSelecionado = null;
-          },
-          (error) => {
-            console.error('Erro na exclusão do pedido:', error);
-          }
-        );
-      });
+  
+    if ((pedidoId !== undefined && pedidoId !== null) || (this.pedidoSelecionado && this.pedidoSelecionado.idPedido !== undefined)) {
+      const idPedido = pedidoId !== undefined ? pedidoId : (this.pedidoSelecionado ? this.pedidoSelecionado.idPedido : null);
+      
+      if (idPedido !== null && idPedido !== undefined) {
+        console.log('Pedido ID (antes da exclusão):', idPedido);
+  
+        this.openConfirmationDialog('Deseja excluir este pedido?', () => {
+          this.pedidoService.deletePedido(idPedido).subscribe(
+            () => {
+              console.log('Pedido excluído com sucesso!');
+              this.carregarPedidos();
+              this.pedidoSelecionado = null;
+            },
+            (error) => {
+              console.error('Erro na exclusão do pedido:', error);
+            }
+          );
+        });
+      } else {
+        console.log('ID do pedido inválido.');
+      }
     } else {
-      console.log('Pedido Selecionado:', this.pedidoSelecionado);
-      console.log('Pedido ID é undefined, null ou inválido.');
       console.log('Nenhum pedido selecionado ou ID do pedido inválido.');
     }
   }
+  
 
   openConfirmationDialog(message: string, callback: () => void): void {
     console.log('Método openConfirmationDialog chamado.');

@@ -3,8 +3,8 @@
   <button routerLink="/dashboard" class="back-button">Voltar para o Dashboard</button>
 
   <div class="form-section">
-    <h3>{{ pedidoSelecionado ? 'Editar Pedido' : 'Novo Pedido' }}</h3>
-    <form *ngIf="!pedidoSelecionado; else editForm" (submit)="criarPedido()" class="pedido-form">
+    <h3>{{ pedidoSelecionado ? 'Detalhes do Pedido' : 'Novo Pedido' }}</h3>
+    <form *ngIf="!pedidoSelecionado" (submit)="criarPedido()" class="pedido-form">
       <label for="clienteId">ID do Cliente:</label>
       <input type="number" id="clienteId" name="clienteId" [(ngModel)]="novoPedido.clienteId" required>
 
@@ -18,23 +18,6 @@
         <button type="submit" class="action-button">{{ pedidoSelecionado ? 'Salvar Edição' : 'Adicionar Pedido' }}</button>
       </div>
     </form>
-
-    <ng-template #editForm>
-      <form *ngIf="pedidoSelecionado" (submit)="atualizarPedido(pedidoSelecionado)" class="pedido-form">
-        <label for="novaQuantidade">Nova Quantidade:</label>
-        <input type="number" id="novaQuantidade" name="novaQuantidade" [(ngModel)]="pedidoSelecionado.quantidade">
-
-        <label for="novoIdCliente">Novo ID do Cliente:</label>
-        <input type="number" id="novoIdCliente" name="novoIdCliente" [(ngModel)]="pedidoSelecionado.clienteId">
-
-        <label for="novoIdProduto">Novo ID do Produto:</label>
-        <input type="number" id="novoIdProduto" name="novoIdProduto" [(ngModel)]="pedidoSelecionado.produtoId">
-
-        <div class="button-container">
-          <button type="submit" class="action-button">Salvar Edição</button>
-        </div>
-      </form>
-    </ng-template>
   </div>
 
   <div class="list-section">
@@ -54,7 +37,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let pedido of pedidos">
-          <td>{{ pedido.idPedido }}</td>
+          <td>{{ pedido?.idPedido }}</td>
           <td>{{ pedido?.clienteId }}</td>
           <td>{{ pedido?.clienteNome }}</td>
           <td>{{ pedido?.produtoId }}</td>
@@ -62,8 +45,8 @@
           <td>{{ pedido?.quantidade }}</td>
           <td>{{ pedido?.preco }}</td>
           <td>
-            <button (click)="selecionarPedido(pedido); excluirPedido()" class="delete-button">Excluir</button>
-          </td>
+            <button (click)="excluirPedido(pedido?.idPedido)" class="delete-button">Excluir</button>
+          </td>          
         </tr>
       </tbody>
     </table>

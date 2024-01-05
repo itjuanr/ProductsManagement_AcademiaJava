@@ -18,6 +18,8 @@ export class PagamentoComponent implements OnInit {
     pedidoId: 0,
   };
 
+  idPesquisa: number | undefined;
+
   constructor(
     private pagamentoService: PagamentoService,
     private dialog: MatDialog,
@@ -29,9 +31,13 @@ export class PagamentoComponent implements OnInit {
   }
 
   carregarPagamentos(): void {
-    this.pagamentoService.getAllPagamentos().subscribe((pagamentos) => {
-      this.pagamentos = pagamentos;
-    });
+    if (this.idPesquisa !== undefined) {
+      this.pesquisarPorId();
+    } else {
+      this.pagamentoService.getAllPagamentos().subscribe((pagamentos) => {
+        this.pagamentos = pagamentos;
+      });
+    }
   }
 
   criarPagamento(): void {
@@ -68,4 +74,31 @@ export class PagamentoComponent implements OnInit {
   formatarData(data: Date): string {
     return this.datePipe.transform(data, 'dd/MM/yyyy HH:mm:ss') || '';
   }
+
+  pesquisarPorId(): void {
+    if (this.idPesquisa !== undefined) {
+      this.pagamentoService.getPagamentoPorId(this.idPesquisa).subscribe(
+        (pagamento) => {
+          this.pagamentos = pagamento ? [pagamento] : [];
+  
+          if (this.pagamentos.length === 0) {
+            this.carregarTodosPagamentos();
+          }
+        },
+        (error) => {
+          console.error('Erro ao buscar pagamento por ID:', error);
+          this.carregarTodosPagamentos();
+        }
+      );
+    } else {
+      this.carregarTodosPagamentos();
+    }
+  }
+  
+  carregarTodosPagamentos(): void {
+    this.pagamentoService.getAllPagamentos().subscribe((pagamentos) => {
+      this.pagamentos = pagamentos;
+    });
+  }
+  
 }

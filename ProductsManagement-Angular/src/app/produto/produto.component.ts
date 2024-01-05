@@ -14,6 +14,7 @@ export class ProdutoComponent implements OnInit {
   novoProduto: Produto = { id: 0, nome: '', preco: 0, categoriaId: 0, fornecedorId: 0 };
   modoEdicao: boolean = false;
   produtoOriginal: Produto | null = null;
+  idPesquisa: number | undefined;
 
   constructor(private produtoService: ProdutoService, private dialog: MatDialog) {}
 
@@ -22,6 +23,22 @@ export class ProdutoComponent implements OnInit {
   }
 
   carregarProdutos(): void {
+    if (this.idPesquisa !== undefined) {
+      this.produtoService.getProdutoById(this.idPesquisa).subscribe(
+        (produto) => {
+          this.produtos = produto ? [produto] : [];
+        },
+        (error) => {
+          console.error('Erro ao obter produto por ID:', error);
+          this.carregarTodosOsProdutos(); 
+        }
+      );
+    } else {
+      this.carregarTodosOsProdutos();
+    }
+  }
+  
+  carregarTodosOsProdutos(): void {
     this.produtoService.getAllProdutos().subscribe(
       (data) => {
         this.produtos = data;
@@ -30,6 +47,13 @@ export class ProdutoComponent implements OnInit {
         console.error('Erro ao obter produtos:', error);
       }
     );
+  }
+  
+
+  pesquisarPorId(): void {
+    if (this.idPesquisa !== undefined) {
+      this.carregarProdutos();
+    }
   }
 
   salvarProduto(): void {

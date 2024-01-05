@@ -14,6 +14,7 @@ export class CategoriaComponent implements OnInit {
   novaCategoria: Categoria = { id: 0, nome: '', descricao: '' };
   isNewCategoria: boolean = true;
   isEditing: boolean = false;
+  idPesquisa: number | undefined;
 
   constructor(private categoriaService: CategoriaService, private dialog: MatDialog) {}
 
@@ -21,10 +22,35 @@ export class CategoriaComponent implements OnInit {
     this.loadCategorias();
   }
 
+  pesquisarPorId(): void {
+    if (this.idPesquisa !== undefined) {
+      this.categoriaService.getCategoriaById(this.idPesquisa).subscribe(
+        (categoria) => {
+          this.categorias = categoria ? [categoria] : [];
+        },
+        (error) => {
+          console.error('Erro ao obter categoria por ID:', error);
+          this.loadAllCategorias();
+        }
+      );
+    } else {
+      this.loadAllCategorias();
+    }
+  }
+
   loadCategorias(): void {
-    this.categoriaService.getAllCategorias().subscribe((categorias) => {
-      this.categorias = categorias;
-    });
+    this.pesquisarPorId();
+  }
+
+  loadAllCategorias(): void {
+    this.categoriaService.getAllCategorias().subscribe(
+      (categorias) => {
+        this.categorias = categorias;
+      },
+      (error) => {
+        console.error('Erro ao obter categorias:', error);
+      }
+    );
   }
 
   createOrUpdateCategoria(): void {

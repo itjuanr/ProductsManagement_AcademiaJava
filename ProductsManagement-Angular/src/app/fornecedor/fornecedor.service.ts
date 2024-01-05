@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { Fornecedor } from './fornecedor';
 import { AuthService } from '../auth.service';
+import { map } from 'rxjs/operators';
+
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +25,7 @@ export class FornecedorService {
     });
   }
 
-  private getAllFornecedoresFromServer(): Observable<Fornecedor[]> {
+  getAllFornecedoresFromServer(): Observable<Fornecedor[]> {
     const headers = this.getHeaders();
     return this.http.get<Fornecedor[]>(this.apiUrl, { headers }).pipe(
       catchError((error) => {
@@ -37,13 +39,10 @@ export class FornecedorService {
     this.fornecedoresSubject.next([...fornecedores]);
   }
 
-  getAllFornecedores(): void {
-    this.getAllFornecedoresFromServer().subscribe(
-      (fornecedores) => {
-        this.emitChanges(fornecedores);
-      }
-    );
+  getAllFornecedores(): Observable<Fornecedor[]> {
+    return this.getAllFornecedoresFromServer();
   }
+  
 
   getFornecedorById(id: number): Observable<Fornecedor> {
     const headers = this.getHeaders();
@@ -82,4 +81,12 @@ export class FornecedorService {
       })
     );
   }
+
+  getFornecedoresById(id: number): Observable<Fornecedor[]> {
+    return this.getAllFornecedoresFromServer().pipe(
+      map((fornecedores: Fornecedor[]) => fornecedores.filter(fornecedor => fornecedor.id === id))
+    );
+  }
+  
+  
 }

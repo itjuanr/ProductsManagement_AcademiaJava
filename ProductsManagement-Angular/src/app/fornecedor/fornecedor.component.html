@@ -2,6 +2,12 @@
   <h2>Fornecedores</h2>
   <button routerLink="/dashboard" class="back-button">Voltar para o Dashboard</button>
 
+  <div class="search-section">
+    <label for="idPesquisa">Pesquisar por ID:</label>
+    <input type="number" id="idPesquisa" name="idPesquisa" [(ngModel)]="idPesquisa">
+    <button (click)="pesquisarFornecedoresPorId()">Pesquisar por ID</button>
+  </div>
+
   <div class="form-section">
     <h3>{{ isNewFornecedor ? 'Novo Fornecedor' : 'Editar Fornecedor' }}</h3>
     <form (submit)="createOrUpdateFornecedor()" class="fornecedor-form">

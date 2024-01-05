@@ -70,5 +70,22 @@ export class ClienteService {
         });
 
     return this.http.delete(`${this.apiUrl}/${id}`, { headers });
+
   }
+  
+  getClienteById(id: number): Observable<Cliente> {
+    const token = this.authService.token;
+  
+    const headers = token
+      ? new HttpHeaders({
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        })
+      : new HttpHeaders({
+          'Content-Type': 'application/json',
+        });
+  
+    return this.http.get<Cliente>(`${this.apiUrl}/${id}`, { headers });
+  }
+  
 }

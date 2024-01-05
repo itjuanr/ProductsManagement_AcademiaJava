@@ -14,6 +14,7 @@ export class FornecedorComponent implements OnInit {
   newFornecedor: Fornecedor = { id: 0, nome: '', cnpj: '' };
   isNewFornecedor: boolean = true;
   isEditing: boolean = false;
+  idPesquisa: number | undefined;
 
   constructor(
     private fornecedorService: FornecedorService,
@@ -26,17 +27,16 @@ export class FornecedorComponent implements OnInit {
   }
 
   getAllFornecedores(): void {
-    this.fornecedorService.fornecedores$.subscribe(
+    this.fornecedorService.getAllFornecedoresFromServer().subscribe(
       (fornecedores) => {
-        this.fornecedores = fornecedores;
+        this.fornecedores = fornecedores; 
       },
       (error) => {
-        console.error('Erro ao obter fornecedores:', error);
+        console.error('Erro ao carregar fornecedores:', error);
       }
     );
-    this.fornecedorService.getAllFornecedores();
   }
-
+  
   createOrUpdateFornecedor(): void {
     if (this.isNewFornecedor) {
       this.createFornecedor();
@@ -116,6 +116,38 @@ export class FornecedorComponent implements OnInit {
         }
       );
     });
+  }
+
+  pesquisarFornecedoresPorId(): void {
+    if (this.idPesquisa !== undefined) {
+      this.fornecedorService.getFornecedoresById(this.idPesquisa).subscribe(
+        (fornecedores) => {
+          if (fornecedores.length === 0) {
+            this.carregarTodosFornecedores();
+          } else {
+            this.fornecedores = fornecedores;
+          }
+        },
+        (error) => {
+          console.error('Erro ao buscar fornecedor por ID:', error);
+          this.carregarTodosFornecedores();
+        }
+      );
+    } else {
+      this.carregarTodosFornecedores();
+    }
+  }
+  
+  
+  carregarTodosFornecedores(): void {
+    this.fornecedorService.getAllFornecedores().subscribe(
+      (fornecedores) => {
+        this.fornecedores = fornecedores;
+      },
+      (error) => {
+        console.error('Erro ao carregar fornecedores:', error);
+      }
+    );
   }
 
   resetForm(): void {

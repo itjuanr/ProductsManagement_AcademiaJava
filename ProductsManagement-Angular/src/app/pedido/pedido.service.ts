@@ -46,4 +46,9 @@ updatePedido(id: number, atualizacao: any): Observable<PedidoDTO> {
   criarPedido(criarPedidoRequest: CriarPedidoRequestDTO): Observable<PedidoDTO> {
     return this.http.post<PedidoDTO>(this.apiUrl, criarPedidoRequest, this.getRequestOptions());
   }
+
+  searchPedidosById(id: number): Observable<PedidoDTO[]> {
+    const params = new HttpParams().set('id', id.toString());
+    return this.http.get<PedidoDTO[]>(this.apiUrl, this.getRequestOptions(params));
+  }
 }

@@ -14,19 +14,46 @@ export class ClienteComponent implements OnInit {
   newCliente: Cliente = { id: 0, nome: '', cpf: '', email: '' };
   isNewCliente: boolean = true;
   isEditing: boolean = false;
+  idPesquisa: number | undefined;
 
   constructor(private clienteService: ClienteService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.loadClientes();
   }
+  
 
-  loadClientes(): void {
-    this.clienteService.getAllClientes().subscribe((clientes) => {
-      this.clientes = clientes;
-    });
+  pesquisarPorId(): void {
+    if (this.idPesquisa !== undefined) {
+      this.clienteService.getClienteById(this.idPesquisa).subscribe(
+        (cliente) => {
+          this.clientes = cliente ? [cliente] : [];
+        },
+        (error) => {
+          console.error('Erro ao obter cliente por ID:', error);
+          this.loadAllClientes();
+        }
+      );
+    } else {
+      this.loadAllClientes();
+    }
   }
 
+  loadClientes(): void {
+    this.pesquisarPorId();
+  }
+
+  loadAllClientes(): void {
+    this.clienteService.getAllClientes().subscribe(
+      (clientes) => {
+        this.clientes = clientes;
+      },
+      (error) => {
+        console.error('Erro ao obter clientes:', error);
+      }
+    );
+  }
+  
   createOrUpdateCliente(): void {
     if (this.isNewCliente) {
       this.createCliente();

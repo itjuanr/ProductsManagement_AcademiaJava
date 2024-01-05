@@ -34,6 +34,11 @@ export class DashboardComponent {
             description: 'Acompanhe e gerencie pedidos realizados.',
             link: '/pedido',
         },
+        {
+            title: 'Pagamento',
+            description: 'Gerencie transações financeiras e registre pagamentos de pedidos.',
+            link: '/pagamentos',
+        },
     ];
 
     constructor(private authService: AuthService) {}

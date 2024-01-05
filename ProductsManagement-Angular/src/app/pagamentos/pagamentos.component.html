@@ -1,0 +1,49 @@
+<div class="container">
+  <h2>Pagamentos</h2>
+  <button routerLink="/dashboard" class="back-button">Voltar para o Dashboard</button>
+  
+  <div class="form-section">
+    <h3>Novo Pagamento</h3>
+    <form (submit)="criarPagamento()" class="pagamento-form">
+      <label for="precoPago">Preço Pago:</label>
+      <input type="number" id="precoPago" name="precoPago" [(ngModel)]="novoPagamento.precoPago" required>
+
+      <label for="pedidoId">ID do Pedido:</label>
+      <input type="number" id="pedidoId" name="pedidoId" [(ngModel)]="novoPagamento.pedidoId" required>
+
+      <div class="button-container">
+        <button type="submit" class="action-button">Adicionar Pagamento</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="list-section">
+    <h3>Lista de Pagamentos</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Valor</th>
+          <th>Data Pagamento</th>
+          <th>Status</th>
+          <th>ID do Pedido</th>
+          <th>ID do Cliente</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pagamento of pagamentos">
+          <td>{{ pagamento.id }}</td>
+          <td>{{ pagamento.valor }}</td>
+          <td>{{ pagamento.dataPagamento }}</td>
+          <td>{{ pagamento.status }}</td>
+          <td>{{ pagamento.pedidoId }}</td>
+          <td>{{ pagamento.clienteId }}</td>
+          <td>
+            <button (click)="excluirPagamento(pagamento.id)" class="delete-button">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

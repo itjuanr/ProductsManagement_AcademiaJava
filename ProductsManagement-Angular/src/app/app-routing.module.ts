@@ -9,6 +9,7 @@ import { CategoriaComponent } from './categoria/categoria.component';
 import { FornecedorComponent } from './fornecedor/fornecedor.component';
 import { ProdutoComponent } from './produto/produto.component';
 import { PedidoComponent } from './pedido/pedido.component';
+import { PagamentoComponent } from './pagamentos/pagamentos.component';
 
 const routes: Routes = [
   { path: 'auth/login', component: LoginComponent }, 
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'fornecedor', component: FornecedorComponent },
   { path: 'produto', component: ProdutoComponent },
   { path: 'pedido', component: PedidoComponent },
+  { path: 'pagamentos', component: PagamentoComponent },
   { path: '**', redirectTo: '/auth/login', pathMatch: 'full' },
 
 ];

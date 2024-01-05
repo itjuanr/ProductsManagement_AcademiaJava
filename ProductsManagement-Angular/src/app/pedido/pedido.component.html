@@ -2,6 +2,15 @@
   <h2>Pedidos</h2>
   <button routerLink="/dashboard" class="back-button">Voltar para o Dashboard</button>
 
+  <div class="search-section">
+    <h3>Pesquisar por ID</h3>
+    <div class="search-container">
+      <label for="idPesquisa">ID do Pedido:</label>
+      <input type="number" id="idPesquisa" name="idPesquisa" [(ngModel)]="idPesquisa">
+      <button type="button" class="action-button" (click)="pesquisarPorId()">Pesquisar</button>
+    </div>
+  </div>
+  
   <div class="form-section">
     <h3>{{ pedidoSelecionado ? 'Detalhes do Pedido' : 'Novo Pedido' }}</h3>
     <form *ngIf="!pedidoSelecionado" (submit)="criarPedido()" class="pedido-form">

@@ -44,4 +44,13 @@ export class PagamentoService {
           'Content-Type': 'application/json',
         });
   }
+
+  getPagamentoPorId(id: number): Observable<PagamentoDTO> {
+    const token = this.authService.token;
+    const headers = this.createHeaders(token);
+  
+    const url = `${this.apiUrl}/${id}`;
+    return this.http.get<PagamentoDTO>(url, { headers });
+  }
+  
 }

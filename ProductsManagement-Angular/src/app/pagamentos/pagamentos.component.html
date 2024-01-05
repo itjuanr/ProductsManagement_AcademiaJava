@@ -2,6 +2,12 @@
   <h2>Pagamentos</h2>
   <button routerLink="/dashboard" class="back-button">Voltar para o Dashboard</button>
   
+  <div class="search-section">
+    <label for="idPesquisa">Pesquisar por ID:</label>
+    <input type="number" id="idPesquisa" name="idPesquisa" [(ngModel)]="idPesquisa">
+    <button (click)="pesquisarPorId()">Pesquisar</button>
+  </div>
+
   <div class="form-section">
     <h3>Novo Pagamento</h3>
     <form (submit)="criarPagamento()" class="pagamento-form">

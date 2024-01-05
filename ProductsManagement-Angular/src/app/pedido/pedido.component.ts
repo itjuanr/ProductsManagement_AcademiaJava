@@ -17,6 +17,7 @@ export class PedidoComponent implements OnInit {
     quantidade: 0,
   };
   pedidoSelecionado: PedidoDTO | null = null;
+  idPesquisa: number | undefined;
 
   constructor(private pedidoService: PedidoService, private dialog: MatDialog) {}
 
@@ -121,5 +122,18 @@ export class PedidoComponent implements OnInit {
         callback();
       }
     });
+  }
+
+  pesquisarPorId(): void {
+    if (this.idPesquisa !== undefined) {
+      this.pedidoService.getPedidoById(this.idPesquisa).subscribe((pedido) => {
+        this.pedidos = pedido ? [pedido] : [];
+      },
+      () => {
+        this.carregarPedidos();
+      });
+    } else {
+      this.carregarPedidos();
+    }
   }
 }

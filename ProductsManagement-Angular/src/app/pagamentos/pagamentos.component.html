@@ -35,7 +35,7 @@
         <tr *ngFor="let pagamento of pagamentos">
           <td>{{ pagamento.id }}</td>
           <td>{{ pagamento.valor }}</td>
-          <td>{{ pagamento.dataPagamento }}</td>
+          <td>{{ formatarData(pagamento.dataPagamento) }}</td>
           <td>{{ pagamento.status }}</td>
           <td>{{ pagamento.pedidoId }}</td>
           <td>{{ pagamento.clienteId }}</td>

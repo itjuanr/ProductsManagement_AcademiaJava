@@ -75,6 +75,9 @@ export class ClienteComponent implements OnInit {
   }
 
   createCliente(): void {
+    const cpfSemMascara = this.newCliente.cpf.replace(/\D/g, '');
+    this.newCliente.cpf = cpfSemMascara;
+
     this.clienteService.createCliente(this.newCliente).subscribe(() => {
       this.loadClientes();
       this.resetForm();
@@ -82,6 +85,10 @@ export class ClienteComponent implements OnInit {
   }
 
   updateCliente(): void {
+    const cpfSemMascara = this.newCliente.cpf.replace(/\D/g, '');
+
+    this.newCliente.cpf = cpfSemMascara;
+
     this.clienteService.updateCliente(this.newCliente).subscribe(() => {
       this.loadClientes();
       this.resetForm();

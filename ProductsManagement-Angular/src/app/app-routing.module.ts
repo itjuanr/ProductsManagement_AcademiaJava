@@ -11,6 +11,7 @@ import { ProdutoComponent } from './produto/produto.component';
 import { PedidoComponent } from './pedido/pedido.component';
 import { PagamentoComponent } from './pagamentos/pagamentos.component';
 
+
 const routes: Routes = [
   { path: 'auth/login', component: LoginComponent }, 
   { path: 'auth/registro', component: RegistroComponent }, 

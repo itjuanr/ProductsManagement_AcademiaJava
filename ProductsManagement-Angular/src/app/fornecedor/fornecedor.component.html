@@ -15,7 +15,7 @@
       <input type="text" id="nome" name="nome" [(ngModel)]="newFornecedor.nome" required>
 
       <label for="cnpj">CNPJ:</label>
-      <input type="text" id="cnpj" name="cnpj" [(ngModel)]="newFornecedor.cnpj" mask="00.000.000/0000-00" required>
+      <input type="text" id="cnpj" name="cnpj" [(ngModel)]="newFornecedor.cnpj" mask="00.000.000/0000-00" required>              
 
       <div class="button-container">
         <button type="submit" class="action-button">{{ isNewFornecedor ? 'Adicionar Fornecedor' : 'Salvar Edição' }}</button>
@@ -39,12 +39,12 @@
         <tr *ngFor="let fornecedor of fornecedores">
           <td>{{ fornecedor.id }}</td>
           <td>{{ fornecedor?.nome }}</td>
-          <td>{{ fornecedor?.cnpj }}</td>
+          <td>{{ formatCnpj(fornecedor.cnpj) }}</td>
           <td>
             <button (click)="editFornecedor(fornecedor)" class="edit-button">Editar</button>
             <button (click)="deleteFornecedor(fornecedor.id)" class="delete-button">Excluir</button>
           </td>
-        </tr>
+        </tr>        
       </tbody>
     </table>
   </div>

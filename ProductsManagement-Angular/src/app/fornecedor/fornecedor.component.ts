@@ -58,6 +58,9 @@ export class FornecedorComponent implements OnInit {
   }
 
   createFornecedor(): void {
+    const cnpjSemMascara = this.newFornecedor.cnpj.replace(/\D/g, '');
+    this.newFornecedor.cnpj = cnpjSemMascara;
+  
     this.fornecedorService.addFornecedor(this.newFornecedor).subscribe(
       (fornecedor) => {
         this.fornecedores.push(fornecedor);
@@ -68,8 +71,12 @@ export class FornecedorComponent implements OnInit {
       }
     );
   }
-
+  
   updateFornecedor(): void {
+    const cnpjSemMascara = this.newFornecedor.cnpj.replace(/\D/g, '');
+
+    this.newFornecedor.cnpj = cnpjSemMascara;
+  
     this.fornecedorService.updateFornecedor(this.newFornecedor.id, this.newFornecedor).subscribe(
       () => {
         const index = this.fornecedores.findIndex((f) => f.id === this.newFornecedor!.id);
@@ -83,6 +90,7 @@ export class FornecedorComponent implements OnInit {
       }
     );
   }
+  
 
   editFornecedor(fornecedor: Fornecedor): void {
     if (this.isEditing) {
@@ -148,6 +156,14 @@ export class FornecedorComponent implements OnInit {
         console.error('Erro ao carregar fornecedores:', error);
       }
     );
+  }
+
+  formatCnpj(cnpj: string): string {
+    const cnpjSemMascara = cnpj.replace(/\D/g, ''); // Remove caracteres não numéricos
+    return cnpjSemMascara.replace(
+      /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
+      '$1.$2.$3/$4-$5'
+    ); 
   }
 
   resetForm(): void {

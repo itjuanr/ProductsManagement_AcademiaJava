@@ -47,7 +47,7 @@
         <tr *ngFor="let cliente of clientes">
           <td>{{ cliente.id }}</td>
           <td>{{ cliente.nome }}</td>
-          <td>{{ cliente.cpf }}</td>
+          <td>{{ cliente.cpf | mask: '000.000.000-00' }}</td>
           <td>{{ cliente.email }}</td>
           <td>
             <button (click)="editCliente(cliente)" class="edit-button">Editar</button>

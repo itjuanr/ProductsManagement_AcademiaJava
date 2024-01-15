@@ -21,6 +21,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { ConfirmDialogComponent } from './confirm-dialog.component';
 import { NgxMaskModule } from 'ngx-mask';
 import { PagamentoComponent } from './pagamentos/pagamentos.component';
+import { ItemPedidoComponent } from './itempedido/itempedido.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { PagamentoComponent } from './pagamentos/pagamentos.component';
     PedidoComponent,
     ConfirmDialogComponent,
     PagamentoComponent,
+    ItemPedidoComponent,  
   ],
   imports: [
     BrowserModule,

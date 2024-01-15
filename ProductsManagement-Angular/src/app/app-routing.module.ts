@@ -10,6 +10,7 @@ import { FornecedorComponent } from './fornecedor/fornecedor.component';
 import { ProdutoComponent } from './produto/produto.component';
 import { PedidoComponent } from './pedido/pedido.component';
 import { PagamentoComponent } from './pagamentos/pagamentos.component';
+import { ItemPedidoComponent } from './itempedido/itempedido.component';
 
 
 const routes: Routes = [
@@ -22,6 +23,7 @@ const routes: Routes = [
   { path: 'produto', component: ProdutoComponent },
   { path: 'pedido', component: PedidoComponent },
   { path: 'pagamentos', component: PagamentoComponent },
+  { path: 'checkout', component: ItemPedidoComponent },
   { path: '**', redirectTo: '/auth/login', pathMatch: 'full' },
 
 ];

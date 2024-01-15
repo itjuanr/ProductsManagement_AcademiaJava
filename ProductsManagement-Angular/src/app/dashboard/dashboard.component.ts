@@ -39,6 +39,11 @@ export class DashboardComponent {
             description: 'Gerencie transações financeiras e registre pagamentos de pedidos.',
             link: '/pagamentos',
         },
+        {
+            title: 'Checkout',
+            description: 'Registre pagamentos e confirme pedidos para concluir suas transações.',
+            link: '/checkout',
+        },
     ];
 
     constructor(private authService: AuthService) {}
